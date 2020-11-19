@@ -89,8 +89,8 @@ fromPairs = foldl addVertexIfColored Map.empty
 toGraph :: Grid -> Graph
 toGraph grid = fromPairs pairsWithColors
   where
-    vertexColorAtCoord :: Int -> Int -> Maybe VertexColor
-    vertexColorAtCoord i j = do
+    vertexColorAtCoord :: Tuple Int Int -> Maybe VertexColor
+    vertexColorAtCoord (Tuple i j) = do
       row <- grid !! i
       join (row !! j)
 
@@ -98,7 +98,8 @@ toGraph grid = fromPairs pairsWithColors
     pairsWithColors = do
       i <- 0 .. 8
       j <- 0 .. 8
-      pure $ Tuple (Tuple i j) (vertexColorAtCoord i j)
+      let coord = Tuple i j
+      pure $ Tuple coord (vertexColorAtCoord coord)
 
 main :: Effect Unit
 main = do
