@@ -13,7 +13,8 @@ import Data.Array ((!!), (..))
 
 type VertexColor = Int
 type Grid = Array (Array (Maybe VertexColor))
-type Graph = Map.Map (Tuple Int Int) VertexColor
+type Coord = Tuple Int Int
+type Graph = Map.Map Coord VertexColor
 
 fromIntGrid :: Array (Array Int) -> Grid
 fromIntGrid = map readRow
@@ -79,22 +80,22 @@ showGrid [[aa, ab, ac, ad, ae, af, ag, ah, ai]
   "+-----+-----+-----+"
 showGrid _ = unsafeThrow "Malformed grid"
 
-fromPairs :: Array (Tuple (Tuple Int Int) (Maybe VertexColor)) -> Graph
+fromPairs :: Array (Tuple Coord (Maybe VertexColor)) -> Graph
 fromPairs = foldl addVertexIfColored Map.empty
   where
-    addVertexIfColored :: Graph -> Tuple (Tuple Int Int) (Maybe VertexColor) -> Graph
+    addVertexIfColored :: Graph -> Tuple Coord (Maybe VertexColor) -> Graph
     addVertexIfColored acc (Tuple coord (Just color)) = Map.insert coord color acc
     addVertexIfColored acc (Tuple coord _) = acc
 
 toGraph :: Grid -> Graph
 toGraph grid = fromPairs pairsWithColors
   where
-    vertexColorAtCoord :: Tuple Int Int -> Maybe VertexColor
+    vertexColorAtCoord :: Coord -> Maybe VertexColor
     vertexColorAtCoord (Tuple i j) = do
       row <- grid !! i
       join (row !! j)
 
-    pairsWithColors :: Array (Tuple (Tuple Int Int) (Maybe VertexColor))
+    pairsWithColors :: Array (Tuple Coord (Maybe VertexColor))
     pairsWithColors = do
       i <- 0 .. 8
       j <- 0 .. 8
