@@ -8,7 +8,7 @@ import Data.Maybe (Maybe(..))
 import Effect.Exception.Unsafe (unsafeThrow)
 
 type VertexColor = Int
-type Grid = Array (Array (Maybe Int))
+type Grid = Array (Array (Maybe VertexColor))
 
 fromIntGrid :: Array (Array Int) -> Grid
 fromIntGrid = map readRow
