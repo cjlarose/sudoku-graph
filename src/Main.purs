@@ -3,12 +3,17 @@ module Main where
 import Prelude
 
 import Effect (Effect)
-import Effect.Console (log)
+import Effect.Console (log, logShow)
 import Data.Maybe (Maybe(..))
 import Effect.Exception.Unsafe (unsafeThrow)
+import Data.Map as Map
+import Data.Tuple (Tuple(..))
+import Data.Foldable (foldl)
+import Data.Array ((!!), (..))
 
 type VertexColor = Int
 type Grid = Array (Array (Maybe VertexColor))
+type Graph = Map.Map (Tuple Int Int) VertexColor
 
 fromIntGrid :: Array (Array Int) -> Grid
 fromIntGrid = map readRow
@@ -74,6 +79,27 @@ showGrid [[aa, ab, ac, ad, ae, af, ag, ah, ai]
   "+-----+-----+-----+"
 showGrid _ = unsafeThrow "Malformed grid"
 
+fromPairs :: Array (Tuple (Tuple Int Int) (Maybe VertexColor)) -> Graph
+fromPairs = foldl addVertexIfColored Map.empty
+  where
+    addVertexIfColored :: Graph -> Tuple (Tuple Int Int) (Maybe VertexColor) -> Graph
+    addVertexIfColored acc (Tuple coord (Just color)) = Map.insert coord color acc
+    addVertexIfColored acc (Tuple coord _) = acc
+
+toGraph :: Grid -> Graph
+toGraph grid = fromPairs pairsWithColors
+  where
+    vertexColorAtCoord :: Int -> Int -> Maybe VertexColor
+    vertexColorAtCoord i j = do
+      row <- grid !! i
+      join (row !! j)
+
+    pairsWithColors :: Array (Tuple (Tuple Int Int) (Maybe VertexColor))
+    pairsWithColors = do
+      i <- 0 .. 8
+      j <- 0 .. 8
+      pure $ Tuple (Tuple i j) (vertexColorAtCoord i j)
+
 main :: Effect Unit
 main = do
   let grid = fromIntGrid [[6, 8, 5, 0, 3, 0, 2, 9, 4]
@@ -86,3 +112,5 @@ main = do
                          ,[1, 9, 0, 0, 7, 0, 4, 6, 0]
                          ,[8, 7, 6, 3, 1, 0, 9, 0, 0]]
   log <<< showGrid $ grid
+  let graph = toGraph grid
+  logShow graph
