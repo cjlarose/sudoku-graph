@@ -3,10 +3,11 @@ module Main where
 import Prelude
 
 import Effect (Effect)
-import Effect.Console (log)
+import Effect.Console (log, logShow)
 
 import Sudoku.Grid (fromGraph, showGrid)
 import Sudoku.Graph (from2dArray)
+import Sudoku.Solve (tryCrossHatch)
 
 main :: Effect Unit
 main = do
@@ -21,3 +22,5 @@ main = do
                           ,[8, 7, 6, 3, 1, 0, 9, 0, 0]]
   let grid = fromGraph graph
   log <<< showGrid $ grid
+  let result = tryCrossHatch graph
+  logShow result
