@@ -1,5 +1,6 @@
 module Sudoku.Graph
-  ( toGraph
+  ( from2dArray
+  , toGraph
   , rowCoords
   , colCoords
   ) where
@@ -18,6 +19,25 @@ import Sudoku.Grid (Grid)
 
 type Coord = Tuple Int Int
 type Graph = Map.Map Coord VertexColor
+
+allCoords :: Set.Set Coord
+allCoords = Set.fromFoldable $ do
+  i <- 0 .. 8
+  j <- 0 .. 8
+  pure $ Tuple i j
+
+from2dArray :: Array (Array Int) -> Graph
+from2dArray grid = foldl addVertexIfColored Map.empty <<< Set.map (\c -> Tuple c $ vertexColorAtCoord c) $ allCoords
+  where
+    vertexColorAtCoord :: Coord -> Maybe VertexColor
+    vertexColorAtCoord (Tuple i j) = do
+      row <- grid !! i
+      val <- row !! j
+      if val == 0 then Nothing else Just val
+
+    addVertexIfColored :: Graph -> Tuple Coord (Maybe VertexColor) -> Graph
+    addVertexIfColored acc (Tuple coord (Just color)) = Map.insert coord color acc
+    addVertexIfColored acc (Tuple _ Nothing) = acc
 
 fromPairs :: Array (Tuple Coord (Maybe VertexColor)) -> Graph
 fromPairs = foldl addVertexIfColored Map.empty
