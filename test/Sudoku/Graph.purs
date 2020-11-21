@@ -1,4 +1,6 @@
-module Test.Sudoku.Graph where
+module Test.Sudoku.Graph
+  ( testGraph
+  ) where
 
 import Prelude
 
@@ -38,7 +40,7 @@ testColCoords = do
                           , Set.fromFoldable [Tuple 0 8, Tuple 1 8, Tuple 2 8, Tuple 3 8, Tuple 4 8, Tuple 5 8, Tuple 6 8, Tuple 7 8, Tuple 8 8] ]
   assertEqual { actual: colCoords, expected: expectedColCoords }
 
-main :: Effect Unit
-main = do
+testGraph :: Effect Unit
+testGraph = do
   testRowCoords
   testColCoords
