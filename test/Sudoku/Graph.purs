@@ -11,7 +11,7 @@ import Data.Map as Map
 import Data.Set as Set
 import Data.Tuple (Tuple(..))
 
-import Sudoku.Graph (from2dArray, rowCoords, colCoords, blockCoords, cliques)
+import Sudoku.Graph (from2dArray, rowCoords, colCoords, blockCoords, cliques, adjacentVertices)
 
 testFrom2dArray :: Effect Unit
 testFrom2dArray = do
@@ -141,6 +141,30 @@ testCliques = do
   assert $ Set.member sampleCol cliques
   assert $ Set.member sampleBlock cliques
 
+testAdjacentVertices :: Effect Unit
+testAdjacentVertices = do
+  let expectedVertices = Set.fromFoldable [(Tuple 0 1)
+                                          ,(Tuple 0 2)
+                                          ,(Tuple 0 3)
+                                          ,(Tuple 0 4)
+                                          ,(Tuple 0 5)
+                                          ,(Tuple 0 6)
+                                          ,(Tuple 0 7)
+                                          ,(Tuple 0 8)
+                                          ,(Tuple 1 0)
+                                          ,(Tuple 1 1)
+                                          ,(Tuple 1 2)
+                                          ,(Tuple 2 0)
+                                          ,(Tuple 2 1)
+                                          ,(Tuple 2 2)
+                                          ,(Tuple 3 0)
+                                          ,(Tuple 4 0)
+                                          ,(Tuple 5 0)
+                                          ,(Tuple 6 0)
+                                          ,(Tuple 7 0)
+                                          ,(Tuple 8 0)]
+  assertEqual { expected: expectedVertices, actual: adjacentVertices (Tuple 0 0) }
+
 testGraph :: Effect Unit
 testGraph = do
   testFrom2dArray
@@ -148,3 +172,4 @@ testGraph = do
   testColCoords
   testBlockCoords
   testCliques
+  testAdjacentVertices
