@@ -7,6 +7,7 @@ import Effect.Console (log, logShow)
 import Data.Maybe (Maybe(..))
 import Effect.Exception.Unsafe (unsafeThrow)
 import Data.Map as Map
+import Data.Set as Set
 import Data.Tuple (Tuple(..))
 import Data.Foldable (foldl)
 import Data.Array ((!!), (..))
@@ -101,6 +102,18 @@ toGraph grid = fromPairs pairsWithColors
       j <- 0 .. 8
       let coord = Tuple i j
       pure $ Tuple coord (vertexColorAtCoord coord)
+
+rowCoords :: Array (Set.Set Coord)
+rowCoords = map coordsForRow $ 0 .. 8
+  where
+    coordsForRow :: Int -> Set.Set Coord
+    coordsForRow i = Set.fromFoldable <<< map (Tuple i) $ 0 .. 8
+
+colCoords :: Array (Set.Set Coord)
+colCoords = map coordsForCol $ 0 .. 8
+  where
+    coordsForCol :: Int -> Set.Set Coord
+    coordsForCol j = Set.fromFoldable <<< map (\i -> Tuple i j) $ 0 .. 8
 
 main :: Effect Unit
 main = do
