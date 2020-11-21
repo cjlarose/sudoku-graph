@@ -4,6 +4,7 @@ module Sudoku.Graph
   , from2dArray
   , rowCoords
   , colCoords
+  , blockCoords
   ) where
 
 import Prelude
@@ -50,3 +51,18 @@ colCoords = map coordsForCol $ 0 .. 8
   where
     coordsForCol :: Int -> Set.Set Coord
     coordsForCol j = Set.fromFoldable <<< map (\i -> Tuple i j) $ 0 .. 8
+
+blockCoords :: Array (Set.Set Coord)
+blockCoords = map coordsForBlock $ do
+  i <- 0 .. 2
+  j <- 0 .. 2
+  pure $ Tuple i j
+
+  where
+    coordsForBlock :: Tuple Int Int -> Set.Set Coord
+    coordsForBlock (Tuple i j) = Set.fromFoldable $ do
+      let startI = i * 3
+      let startJ = j * 3
+      i2 <- startI .. (startI + 2)
+      j2 <- startJ .. (startJ + 2)
+      pure $ Tuple i2 j2
