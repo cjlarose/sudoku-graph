@@ -7,6 +7,7 @@ module Sudoku.Graph
   , blockCoords
   , cliques
   , adjacentVertices
+  , uncoloredVerticies
   ) where
 
 import Prelude
@@ -75,3 +76,6 @@ cliques = Set.unions <<< map Set.fromFoldable $ [rowCoords, colCoords, blockCoor
 
 adjacentVertices :: Coord -> Set.Set Coord
 adjacentVertices coord = Set.delete coord <<< Set.unions <<< Set.filter (Set.member coord) $ cliques
+
+uncoloredVerticies :: Graph -> Set.Set Coord
+uncoloredVerticies = Set.difference allCoords <<< Map.keys
