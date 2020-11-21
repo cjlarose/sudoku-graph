@@ -1,25 +1,30 @@
 module Sudoku.Grid
   ( Grid
-  , fromIntGrid
+  , fromGraph
   , showGrid
   ) where
 
 import Prelude
 
 import Data.Maybe (Maybe(..))
+import Data.Array ((..))
+import Data.Map as Map
+import Data.Tuple (Tuple(..))
 import Effect.Exception.Unsafe (unsafeThrow)
 
 import Sudoku.VertexColor (VertexColor)
+import Sudoku.Graph (Graph)
 
 type Grid = Array (Array (Maybe VertexColor))
 
-fromIntGrid :: Array (Array Int) -> Grid
-fromIntGrid = map readRow
+fromGraph :: Graph -> Grid
+fromGraph graph = map getRow $ 0 .. 8
   where
-    readRow = map readCell
-    readCell :: Int -> Maybe VertexColor
-    readCell 0 = Nothing
-    readCell x = Just x
+    getColor :: Int -> Int -> Maybe VertexColor
+    getColor i j = Map.lookup (Tuple i j) graph 
+
+    getRow :: Int -> Array (Maybe VertexColor)
+    getRow i = map (getColor i) $ 0 .. 8
 
 showCell :: Maybe Int -> String
 showCell Nothing = " "

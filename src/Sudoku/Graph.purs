@@ -1,6 +1,7 @@
 module Sudoku.Graph
-  ( from2dArray
-  , toGraph
+  ( Graph
+  , Coord
+  , from2dArray
   , rowCoords
   , colCoords
   ) where
@@ -15,7 +16,6 @@ import Data.Maybe (Maybe(..))
 import Data.Foldable (foldl)
 
 import Sudoku.VertexColor (VertexColor)
-import Sudoku.Grid (Grid)
 
 type Coord = Tuple Int Int
 type Graph = Map.Map Coord VertexColor
@@ -38,28 +38,6 @@ from2dArray grid = foldl addVertexIfColored Map.empty <<< Set.map (\c -> Tuple c
     addVertexIfColored :: Graph -> Tuple Coord (Maybe VertexColor) -> Graph
     addVertexIfColored acc (Tuple coord (Just color)) = Map.insert coord color acc
     addVertexIfColored acc (Tuple _ Nothing) = acc
-
-fromPairs :: Array (Tuple Coord (Maybe VertexColor)) -> Graph
-fromPairs = foldl addVertexIfColored Map.empty
-  where
-    addVertexIfColored :: Graph -> Tuple Coord (Maybe VertexColor) -> Graph
-    addVertexIfColored acc (Tuple coord (Just color)) = Map.insert coord color acc
-    addVertexIfColored acc (Tuple coord _) = acc
-
-toGraph :: Grid -> Graph
-toGraph grid = fromPairs pairsWithColors
-  where
-    vertexColorAtCoord :: Coord -> Maybe VertexColor
-    vertexColorAtCoord (Tuple i j) = do
-      row <- grid !! i
-      join (row !! j)
-
-    pairsWithColors :: Array (Tuple Coord (Maybe VertexColor))
-    pairsWithColors = do
-      i <- 0 .. 8
-      j <- 0 .. 8
-      let coord = Tuple i j
-      pure $ Tuple coord (vertexColorAtCoord coord)
 
 rowCoords :: Array (Set.Set Coord)
 rowCoords = map coordsForRow $ 0 .. 8
