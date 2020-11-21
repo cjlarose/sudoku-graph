@@ -5,13 +5,13 @@ module Test.Sudoku.Graph
 import Prelude
 
 import Effect (Effect)
-import Test.Assert (assertEqual)
+import Test.Assert (assert, assertEqual)
 import Data.Array (length)
 import Data.Map as Map
 import Data.Set as Set
 import Data.Tuple (Tuple(..))
 
-import Sudoku.Graph (from2dArray, rowCoords, colCoords, blockCoords)
+import Sudoku.Graph (from2dArray, rowCoords, colCoords, blockCoords, cliques)
 
 testFrom2dArray :: Effect Unit
 testFrom2dArray = do
@@ -129,9 +129,22 @@ testBlockCoords = do
                                           ,Tuple 8 6, Tuple 8 7, Tuple 8 8] ]
   assertEqual { expected: expectedCoords, actual: blockCoords }
 
+testCliques :: Effect Unit
+testCliques = do
+  assertEqual { expected: 27, actual: Set.size cliques }
+  let sampleRow = Set.fromFoldable [Tuple 3 0, Tuple 3 1, Tuple 3 2, Tuple 3 3, Tuple 3 4, Tuple 3 5, Tuple 3 6, Tuple 3 7, Tuple 3 8]
+  let sampleCol = Set.fromFoldable [Tuple 0 5, Tuple 1 5, Tuple 2 5, Tuple 3 5, Tuple 4 5, Tuple 5 5, Tuple 6 5, Tuple 7 5, Tuple 8 5]
+  let sampleBlock = Set.fromFoldable [Tuple 6 6, Tuple 6 7, Tuple 6 8
+                                     ,Tuple 7 6, Tuple 7 7, Tuple 7 8
+                                     ,Tuple 8 6, Tuple 8 7, Tuple 8 8]
+  assert $ Set.member sampleRow cliques
+  assert $ Set.member sampleCol cliques
+  assert $ Set.member sampleBlock cliques
+
 testGraph :: Effect Unit
 testGraph = do
   testFrom2dArray
   testRowCoords
   testColCoords
   testBlockCoords
+  testCliques

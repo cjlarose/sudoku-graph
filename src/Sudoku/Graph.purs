@@ -5,6 +5,7 @@ module Sudoku.Graph
   , rowCoords
   , colCoords
   , blockCoords
+  , cliques
   ) where
 
 import Prelude
@@ -66,3 +67,7 @@ blockCoords = map coordsForBlock $ do
       i2 <- startI .. (startI + 2)
       j2 <- startJ .. (startJ + 2)
       pure $ Tuple i2 j2
+
+-- | Returns the 27 9-cliques of the sudoku graph
+cliques :: Set.Set (Set.Set Coord)
+cliques = Set.unions <<< map Set.fromFoldable $ [rowCoords, colCoords, blockCoords]
