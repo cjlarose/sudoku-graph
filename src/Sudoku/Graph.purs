@@ -8,6 +8,7 @@ module Sudoku.Graph
   , cliques
   , adjacentVertices
   , uncoloredVerticies
+  , setVertexColor
   ) where
 
 import Prelude
@@ -79,3 +80,6 @@ adjacentVertices coord = Set.delete coord <<< Set.unions <<< Set.filter (Set.mem
 
 uncoloredVerticies :: Graph -> Set.Set Coord
 uncoloredVerticies = Set.difference allCoords <<< Map.keys
+
+setVertexColor :: Coord -> VertexColor -> Graph -> Graph
+setVertexColor = Map.insert
