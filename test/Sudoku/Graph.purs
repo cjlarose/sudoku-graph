@@ -25,50 +25,50 @@ testFrom2dArray = do
                ,[0, 0, 0, 0, 0, 9, 0, 1, 0]
                ,[1, 9, 0, 0, 7, 0, 4, 6, 0]
                ,[8, 7, 6, 3, 1, 0, 9, 0, 0]]
-  let expectedGraph = Map.fromFoldable [Tuple (Tuple 0 0) (VertexColor 6)
-                                       ,Tuple (Tuple 0 1) (VertexColor 8)
-                                       ,Tuple (Tuple 0 2) (VertexColor 5)
-                                       ,Tuple (Tuple 0 4) (VertexColor 3)
-                                       ,Tuple (Tuple 0 6) (VertexColor 2)
-                                       ,Tuple (Tuple 0 7) (VertexColor 9)
-                                       ,Tuple (Tuple 0 8) (VertexColor 4)
-                                       ,Tuple (Tuple 1 4) (VertexColor 9)
-                                       ,Tuple (Tuple 1 5) (VertexColor 2)
-                                       ,Tuple (Tuple 1 8) (VertexColor 5)
-                                       ,Tuple (Tuple 2 2) (VertexColor 3)
-                                       ,Tuple (Tuple 2 4) (VertexColor 5)
-                                       ,Tuple (Tuple 2 5) (VertexColor 6)
-                                       ,Tuple (Tuple 2 7) (VertexColor 7)
-                                       ,Tuple (Tuple 3 0) (VertexColor 2)
-                                       ,Tuple (Tuple 3 1) (VertexColor 1)
-                                       ,Tuple (Tuple 3 2) (VertexColor 9)
-                                       ,Tuple (Tuple 3 3) (VertexColor 6)
-                                       ,Tuple (Tuple 3 4) (VertexColor 8)
-                                       ,Tuple (Tuple 3 5) (VertexColor 3)
-                                       ,Tuple (Tuple 3 6) (VertexColor 5)
-                                       ,Tuple (Tuple 3 7) (VertexColor 4)
-                                       ,Tuple (Tuple 4 0) (VertexColor 4)
-                                       ,Tuple (Tuple 4 1) (VertexColor 5)
-                                       ,Tuple (Tuple 4 3) (VertexColor 9)
-                                       ,Tuple (Tuple 4 4) (VertexColor 2)
-                                       ,Tuple (Tuple 4 7) (VertexColor 8)
-                                       ,Tuple (Tuple 5 2) (VertexColor 8)
-                                       ,Tuple (Tuple 5 5) (VertexColor 5)
-                                       ,Tuple (Tuple 5 6) (VertexColor 1)
-                                       ,Tuple (Tuple 5 7) (VertexColor 2)
-                                       ,Tuple (Tuple 6 5) (VertexColor 9)
-                                       ,Tuple (Tuple 6 7) (VertexColor 1)
-                                       ,Tuple (Tuple 7 0) (VertexColor 1)
-                                       ,Tuple (Tuple 7 1) (VertexColor 9)
-                                       ,Tuple (Tuple 7 4) (VertexColor 7)
-                                       ,Tuple (Tuple 7 6) (VertexColor 4)
-                                       ,Tuple (Tuple 7 7) (VertexColor 6)
-                                       ,Tuple (Tuple 8 0) (VertexColor 8)
-                                       ,Tuple (Tuple 8 1) (VertexColor 7)
-                                       ,Tuple (Tuple 8 2) (VertexColor 6)
-                                       ,Tuple (Tuple 8 3) (VertexColor 3)
-                                       ,Tuple (Tuple 8 4) (VertexColor 1)
-                                       ,Tuple (Tuple 8 6) (VertexColor 9)]
+  let expectedGraph = Map.fromFoldable [Tuple (Tuple 0 0) Six
+                                       ,Tuple (Tuple 0 1) Eight
+                                       ,Tuple (Tuple 0 2) Five
+                                       ,Tuple (Tuple 0 4) Three
+                                       ,Tuple (Tuple 0 6) Two
+                                       ,Tuple (Tuple 0 7) Nine
+                                       ,Tuple (Tuple 0 8) Four
+                                       ,Tuple (Tuple 1 4) Nine
+                                       ,Tuple (Tuple 1 5) Two
+                                       ,Tuple (Tuple 1 8) Five
+                                       ,Tuple (Tuple 2 2) Three
+                                       ,Tuple (Tuple 2 4) Five
+                                       ,Tuple (Tuple 2 5) Six
+                                       ,Tuple (Tuple 2 7) Seven
+                                       ,Tuple (Tuple 3 0) Two
+                                       ,Tuple (Tuple 3 1) One
+                                       ,Tuple (Tuple 3 2) Nine
+                                       ,Tuple (Tuple 3 3) Six
+                                       ,Tuple (Tuple 3 4) Eight
+                                       ,Tuple (Tuple 3 5) Three
+                                       ,Tuple (Tuple 3 6) Five
+                                       ,Tuple (Tuple 3 7) Four
+                                       ,Tuple (Tuple 4 0) Four
+                                       ,Tuple (Tuple 4 1) Five
+                                       ,Tuple (Tuple 4 3) Nine
+                                       ,Tuple (Tuple 4 4) Two
+                                       ,Tuple (Tuple 4 7) Eight
+                                       ,Tuple (Tuple 5 2) Eight
+                                       ,Tuple (Tuple 5 5) Five
+                                       ,Tuple (Tuple 5 6) One
+                                       ,Tuple (Tuple 5 7) Two
+                                       ,Tuple (Tuple 6 5) Nine
+                                       ,Tuple (Tuple 6 7) One
+                                       ,Tuple (Tuple 7 0) One
+                                       ,Tuple (Tuple 7 1) Nine
+                                       ,Tuple (Tuple 7 4) Seven
+                                       ,Tuple (Tuple 7 6) Four
+                                       ,Tuple (Tuple 7 7) Six
+                                       ,Tuple (Tuple 8 0) Eight
+                                       ,Tuple (Tuple 8 1) Seven
+                                       ,Tuple (Tuple 8 2) Six
+                                       ,Tuple (Tuple 8 3) Three
+                                       ,Tuple (Tuple 8 4) One
+                                       ,Tuple (Tuple 8 6) Nine]
   assertEqual { actual: from2dArray matrix, expected: expectedGraph }
 
 testRowCoords :: Effect Unit
@@ -168,50 +168,50 @@ testAdjacentVertices = do
 
 testUncoloredVertices :: Effect Unit
 testUncoloredVertices = do
-  let graph = Map.fromFoldable [Tuple (Tuple 0 0) (VertexColor 6)
-                               ,Tuple (Tuple 0 1) (VertexColor 8)
-                               ,Tuple (Tuple 0 2) (VertexColor 5)
-                               ,Tuple (Tuple 0 4) (VertexColor 3)
-                               ,Tuple (Tuple 0 6) (VertexColor 2)
-                               ,Tuple (Tuple 0 7) (VertexColor 9)
-                               ,Tuple (Tuple 0 8) (VertexColor 4)
-                               ,Tuple (Tuple 1 4) (VertexColor 9)
-                               ,Tuple (Tuple 1 5) (VertexColor 2)
-                               ,Tuple (Tuple 1 8) (VertexColor 5)
-                               ,Tuple (Tuple 2 2) (VertexColor 3)
-                               ,Tuple (Tuple 2 4) (VertexColor 5)
-                               ,Tuple (Tuple 2 5) (VertexColor 6)
-                               ,Tuple (Tuple 2 7) (VertexColor 7)
-                               ,Tuple (Tuple 3 0) (VertexColor 2)
-                               ,Tuple (Tuple 3 1) (VertexColor 1)
-                               ,Tuple (Tuple 3 2) (VertexColor 9)
-                               ,Tuple (Tuple 3 3) (VertexColor 6)
-                               ,Tuple (Tuple 3 4) (VertexColor 8)
-                               ,Tuple (Tuple 3 5) (VertexColor 3)
-                               ,Tuple (Tuple 3 6) (VertexColor 5)
-                               ,Tuple (Tuple 3 7) (VertexColor 4)
-                               ,Tuple (Tuple 4 0) (VertexColor 4)
-                               ,Tuple (Tuple 4 1) (VertexColor 5)
-                               ,Tuple (Tuple 4 3) (VertexColor 9)
-                               ,Tuple (Tuple 4 4) (VertexColor 2)
-                               ,Tuple (Tuple 4 7) (VertexColor 8)
-                               ,Tuple (Tuple 5 2) (VertexColor 8)
-                               ,Tuple (Tuple 5 5) (VertexColor 5)
-                               ,Tuple (Tuple 5 6) (VertexColor 1)
-                               ,Tuple (Tuple 5 7) (VertexColor 2)
-                               ,Tuple (Tuple 6 5) (VertexColor 9)
-                               ,Tuple (Tuple 6 7) (VertexColor 1)
-                               ,Tuple (Tuple 7 0) (VertexColor 1)
-                               ,Tuple (Tuple 7 1) (VertexColor 9)
-                               ,Tuple (Tuple 7 4) (VertexColor 7)
-                               ,Tuple (Tuple 7 6) (VertexColor 4)
-                               ,Tuple (Tuple 7 7) (VertexColor 6)
-                               ,Tuple (Tuple 8 0) (VertexColor 8)
-                               ,Tuple (Tuple 8 1) (VertexColor 7)
-                               ,Tuple (Tuple 8 2) (VertexColor 6)
-                               ,Tuple (Tuple 8 3) (VertexColor 3)
-                               ,Tuple (Tuple 8 4) (VertexColor 1)
-                               ,Tuple (Tuple 8 6) (VertexColor 9)]
+  let graph = Map.fromFoldable [Tuple (Tuple 0 0) Six
+                               ,Tuple (Tuple 0 1) Eight
+                               ,Tuple (Tuple 0 2) Five
+                               ,Tuple (Tuple 0 4) Three
+                               ,Tuple (Tuple 0 6) Two
+                               ,Tuple (Tuple 0 7) Nine
+                               ,Tuple (Tuple 0 8) Four
+                               ,Tuple (Tuple 1 4) Nine
+                               ,Tuple (Tuple 1 5) Two
+                               ,Tuple (Tuple 1 8) Five
+                               ,Tuple (Tuple 2 2) Three
+                               ,Tuple (Tuple 2 4) Five
+                               ,Tuple (Tuple 2 5) Six
+                               ,Tuple (Tuple 2 7) Seven
+                               ,Tuple (Tuple 3 0) Two
+                               ,Tuple (Tuple 3 1) One
+                               ,Tuple (Tuple 3 2) Nine
+                               ,Tuple (Tuple 3 3) Six
+                               ,Tuple (Tuple 3 4) Eight
+                               ,Tuple (Tuple 3 5) Three
+                               ,Tuple (Tuple 3 6) Five
+                               ,Tuple (Tuple 3 7) Four
+                               ,Tuple (Tuple 4 0) Four
+                               ,Tuple (Tuple 4 1) Five
+                               ,Tuple (Tuple 4 3) Nine
+                               ,Tuple (Tuple 4 4) Two
+                               ,Tuple (Tuple 4 7) Eight
+                               ,Tuple (Tuple 5 2) Eight
+                               ,Tuple (Tuple 5 5) Five
+                               ,Tuple (Tuple 5 6) One
+                               ,Tuple (Tuple 5 7) Two
+                               ,Tuple (Tuple 6 5) Nine
+                               ,Tuple (Tuple 6 7) One
+                               ,Tuple (Tuple 7 0) One
+                               ,Tuple (Tuple 7 1) Nine
+                               ,Tuple (Tuple 7 4) Seven
+                               ,Tuple (Tuple 7 6) Four
+                               ,Tuple (Tuple 7 7) Six
+                               ,Tuple (Tuple 8 0) Eight
+                               ,Tuple (Tuple 8 1) Seven
+                               ,Tuple (Tuple 8 2) Six
+                               ,Tuple (Tuple 8 3) Three
+                               ,Tuple (Tuple 8 4) One
+                               ,Tuple (Tuple 8 6) Nine]
   let expectedUncolored = Set.fromFoldable [Tuple 0 3
                                            ,Tuple 0 5
                                            ,Tuple 1 0

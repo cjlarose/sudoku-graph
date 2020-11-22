@@ -12,7 +12,8 @@ import Data.Map as Map
 import Data.Tuple (Tuple(..))
 import Effect.Exception.Unsafe (unsafeThrow)
 
-import Sudoku.VertexColor (VertexColor(..))
+import Sudoku.VertexColor (VertexColor)
+import Sudoku.VertexColor as Color
 import Sudoku.Graph (Graph)
 
 type Grid = Array (Array (Maybe VertexColor))
@@ -28,7 +29,7 @@ fromGraph graph = map getRow $ 0 .. 8
 
 showCell :: Maybe VertexColor -> String
 showCell Nothing = " "
-showCell (Just (VertexColor color)) = show color
+showCell (Just color) = show <<< Color.toInt $ color
 
 showGrid :: Grid -> String
 showGrid [[aa, ab, ac, ad, ae, af, ag, ah, ai]

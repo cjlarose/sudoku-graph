@@ -11,7 +11,7 @@ import Data.Tuple (Tuple(..))
 import Node.Process as Process
 import Node.ReadLine as ReadLine
 
-import Sudoku.VertexColor (VertexColor(..))
+import Sudoku.VertexColor as Color
 import Sudoku.Grid (fromGraph, showGrid)
 import Sudoku.Graph (Graph, from2dArray, setVertexColor)
 import Sudoku.Solve (tryCrossHatch)
@@ -26,8 +26,8 @@ suggestAndPrompt interface graph = do
     Nothing -> do
       log "No suggestion"
       Process.exit 0
-    Just suggestion@(Tuple coord@(Tuple i j) color@(VertexColor val)) -> do
-      log $ "Suggestion: Fill cell (" <> show i <> "," <> show j <> ")" <> " with value " <> show val
+    Just suggestion@(Tuple coord@(Tuple i j) color) -> do
+      log $ "Suggestion: Fill cell (" <> show i <> "," <> show j <> ")" <> " with value " <> show (Color.toInt color)
       let newGraph = setVertexColor coord color graph
       printGraph newGraph
       log ""
