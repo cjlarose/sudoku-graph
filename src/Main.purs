@@ -4,10 +4,35 @@ import Prelude
 
 import Effect (Effect)
 import Effect.Console (log, logShow)
+import Data.Options ((:=))
+import Data.Maybe (Maybe(..))
+import Data.Tuple (Tuple(..))
+
+import Node.Process as Process
+import Node.ReadLine as ReadLine
 
 import Sudoku.Grid (fromGraph, showGrid)
-import Sudoku.Graph (from2dArray)
+import Sudoku.Graph (Graph, from2dArray, setVertexColor)
 import Sudoku.Solve (tryCrossHatch)
+
+printGraph :: Graph -> Effect Unit
+printGraph = log <<< showGrid <<< fromGraph
+
+suggestAndPrompt :: ReadLine.Interface -> Graph -> Effect Unit
+suggestAndPrompt interface graph = do
+  let result = tryCrossHatch graph
+  case result of
+    Nothing -> do
+      log "No suggestion"
+      Process.exit 0
+    Just suggestion@(Tuple coord color) -> do
+      logShow suggestion
+      let newGraph = setVertexColor coord color graph
+      printGraph newGraph
+      let handleLine line = if line == "y"
+                            then suggestAndPrompt interface newGraph
+                            else Process.exit 0
+      ReadLine.question "Continue [yN]? " handleLine interface
 
 main :: Effect Unit
 main = do
@@ -20,7 +45,6 @@ main = do
                           ,[0, 0, 0, 0, 0, 9, 0, 1, 0]
                           ,[1, 9, 0, 0, 7, 0, 4, 6, 0]
                           ,[8, 7, 6, 3, 1, 0, 9, 0, 0]]
-  let grid = fromGraph graph
-  log <<< showGrid $ grid
-  let result = tryCrossHatch graph
-  logShow result
+  printGraph graph
+  interface <- ReadLine.createInterface Process.stdin $ ReadLine.output := Process.stdout
+  suggestAndPrompt interface graph
