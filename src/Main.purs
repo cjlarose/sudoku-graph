@@ -3,7 +3,7 @@ module Main where
 import Prelude
 
 import Effect (Effect)
-import Effect.Console (log, logShow)
+import Effect.Console (log)
 import Data.Options ((:=))
 import Data.Maybe (Maybe(..))
 import Data.Tuple (Tuple(..))
@@ -11,6 +11,7 @@ import Data.Tuple (Tuple(..))
 import Node.Process as Process
 import Node.ReadLine as ReadLine
 
+import Sudoku.VertexColor (VertexColor(..))
 import Sudoku.Grid (fromGraph, showGrid)
 import Sudoku.Graph (Graph, from2dArray, setVertexColor)
 import Sudoku.Solve (tryCrossHatch)
@@ -25,10 +26,11 @@ suggestAndPrompt interface graph = do
     Nothing -> do
       log "No suggestion"
       Process.exit 0
-    Just suggestion@(Tuple coord color) -> do
-      logShow suggestion
+    Just suggestion@(Tuple coord@(Tuple i j) color@(VertexColor val)) -> do
+      log $ "Suggestion: Fill cell (" <> show i <> "," <> show j <> ")" <> " with value " <> show val
       let newGraph = setVertexColor coord color graph
       printGraph newGraph
+      log ""
       let handleLine line = if line == "y"
                             then suggestAndPrompt interface newGraph
                             else Process.exit 0
@@ -45,6 +47,8 @@ main = do
                           ,[0, 0, 0, 0, 0, 9, 0, 1, 0]
                           ,[1, 9, 0, 0, 7, 0, 4, 6, 0]
                           ,[8, 7, 6, 3, 1, 0, 9, 0, 0]]
+  log "Input:"
   printGraph graph
+  log ""
   interface <- ReadLine.createInterface Process.stdin $ ReadLine.output := Process.stdout
   suggestAndPrompt interface graph
