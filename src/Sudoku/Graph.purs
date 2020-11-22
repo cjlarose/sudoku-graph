@@ -19,7 +19,7 @@ import Data.Set as Set
 import Data.Maybe (Maybe(..))
 import Data.Foldable (foldl)
 
-import Sudoku.VertexColor (VertexColor)
+import Sudoku.VertexColor (VertexColor(..))
 
 type Coord = Tuple Int Int
 type Graph = Map.Map Coord VertexColor
@@ -37,7 +37,7 @@ from2dArray grid = foldl addVertexIfColored Map.empty <<< Set.map (\c -> Tuple c
     vertexColorAtCoord (Tuple i j) = do
       row <- grid !! i
       val <- row !! j
-      if val == 0 then Nothing else Just val
+      if val == 0 then Nothing else Just (VertexColor val)
 
     addVertexIfColored :: Graph -> Tuple Coord (Maybe VertexColor) -> Graph
     addVertexIfColored acc (Tuple coord (Just color)) = Map.insert coord color acc
