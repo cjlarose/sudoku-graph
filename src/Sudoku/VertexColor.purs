@@ -17,4 +17,4 @@ instance showVertexColor :: Show VertexColor where
   show (VertexColor color) = "(VertexColor " <> show color <> ")"
 
 allColors :: Set.Set VertexColor
-allColors = Set.map VertexColor <<< Set.fromFoldable $ 0 .. 8
+allColors = Set.map VertexColor <<< Set.fromFoldable $ 1 .. 9
