@@ -8,24 +8,20 @@ import Prelude
 
 import Data.Maybe (Maybe(..))
 import Data.Array ((..))
-import Data.Map as Map
 import Data.Tuple (Tuple(..))
 import Effect.Exception.Unsafe (unsafeThrow)
 
 import Sudoku.VertexColor (VertexColor)
 import Sudoku.VertexColor as Color
-import Sudoku.PartialColoring (PartialColoring)
+import Sudoku.PartialColoring (PartialColoring, getVertexColor)
 
 type Grid = Array (Array (Maybe VertexColor))
 
 fromPartialColoring :: PartialColoring -> Grid
 fromPartialColoring coloring = map getRow $ 0 .. 8
   where
-    getColor :: Int -> Int -> Maybe VertexColor
-    getColor i j = Map.lookup (Tuple i j) coloring 
-
     getRow :: Int -> Array (Maybe VertexColor)
-    getRow i = map (getColor i) $ 0 .. 8
+    getRow i = map (\j -> getVertexColor (Tuple i j) coloring) $ 0 .. 8
 
 showCell :: Maybe VertexColor -> String
 showCell Nothing = " "

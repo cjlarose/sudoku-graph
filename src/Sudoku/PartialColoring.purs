@@ -1,5 +1,5 @@
 module Sudoku.PartialColoring
-  ( PartialColoring
+  ( PartialColoring(..)
   , Coord
   , from2dArray
   , rowCoords
@@ -8,6 +8,7 @@ module Sudoku.PartialColoring
   , cliques
   , adjacentVertices
   , uncoloredVerticies
+  , getVertexColor
   , setVertexColor
   ) where
 
@@ -23,7 +24,12 @@ import Data.Foldable (foldl)
 import Sudoku.VertexColor (VertexColor, fromInt)
 
 type Coord = Tuple Int Int
-type PartialColoring = Map.Map Coord VertexColor
+newtype PartialColoring = PartialColoring (Map.Map Coord VertexColor)
+
+derive instance eqPartialColoring :: Eq PartialColoring
+
+instance showPartialColoring :: Show PartialColoring where
+  show (PartialColoring coloring) = "(PartialColoring " <> show coloring <> ")"
 
 allCoords :: Set.Set Coord
 allCoords = Set.fromFoldable $ do
@@ -31,8 +37,11 @@ allCoords = Set.fromFoldable $ do
   j <- 0 .. 8
   pure $ Tuple i j
 
+empty :: PartialColoring
+empty = PartialColoring Map.empty
+
 from2dArray :: Array (Array Int) -> PartialColoring
-from2dArray grid = foldl addVertexIfColored Map.empty <<< Set.map (\c -> Tuple c $ vertexColorAtCoord c) $ allCoords
+from2dArray grid = foldl addVertexIfColored empty <<< Set.map (\c -> Tuple c $ vertexColorAtCoord c) $ allCoords
   where
     vertexColorAtCoord :: Coord -> Maybe VertexColor
     vertexColorAtCoord (Tuple i j) = do
@@ -41,7 +50,7 @@ from2dArray grid = foldl addVertexIfColored Map.empty <<< Set.map (\c -> Tuple c
       fromInt val
 
     addVertexIfColored :: PartialColoring -> Tuple Coord (Maybe VertexColor) -> PartialColoring
-    addVertexIfColored acc (Tuple coord (Just color)) = Map.insert coord color acc
+    addVertexIfColored acc (Tuple coord (Just color)) = setVertexColor coord color acc
     addVertexIfColored acc (Tuple _ Nothing) = acc
 
 rowCoords :: Array (Set.Set Coord)
@@ -79,7 +88,10 @@ adjacentVertices :: Coord -> Set.Set Coord
 adjacentVertices coord = Set.delete coord <<< Set.unions <<< Set.filter (Set.member coord) $ cliques
 
 uncoloredVerticies :: PartialColoring -> Set.Set Coord
-uncoloredVerticies = Set.difference allCoords <<< Map.keys
+uncoloredVerticies (PartialColoring coloring) = Set.difference allCoords <<< Map.keys $ coloring
+
+getVertexColor :: Coord -> PartialColoring -> Maybe VertexColor
+getVertexColor coord (PartialColoring coloring) = Map.lookup coord coloring
 
 setVertexColor :: Coord -> VertexColor -> PartialColoring -> PartialColoring
-setVertexColor = Map.insert
+setVertexColor coord color (PartialColoring coloring) = PartialColoring <<< Map.insert coord color $ coloring
