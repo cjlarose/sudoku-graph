@@ -1,5 +1,5 @@
 module Sudoku.PartialColoring
-  ( Graph
+  ( PartialColoring
   , Coord
   , from2dArray
   , rowCoords
@@ -23,7 +23,7 @@ import Data.Foldable (foldl)
 import Sudoku.VertexColor (VertexColor, fromInt)
 
 type Coord = Tuple Int Int
-type Graph = Map.Map Coord VertexColor
+type PartialColoring = Map.Map Coord VertexColor
 
 allCoords :: Set.Set Coord
 allCoords = Set.fromFoldable $ do
@@ -31,7 +31,7 @@ allCoords = Set.fromFoldable $ do
   j <- 0 .. 8
   pure $ Tuple i j
 
-from2dArray :: Array (Array Int) -> Graph
+from2dArray :: Array (Array Int) -> PartialColoring
 from2dArray grid = foldl addVertexIfColored Map.empty <<< Set.map (\c -> Tuple c $ vertexColorAtCoord c) $ allCoords
   where
     vertexColorAtCoord :: Coord -> Maybe VertexColor
@@ -40,7 +40,7 @@ from2dArray grid = foldl addVertexIfColored Map.empty <<< Set.map (\c -> Tuple c
       val <- row !! j
       fromInt val
 
-    addVertexIfColored :: Graph -> Tuple Coord (Maybe VertexColor) -> Graph
+    addVertexIfColored :: PartialColoring -> Tuple Coord (Maybe VertexColor) -> PartialColoring
     addVertexIfColored acc (Tuple coord (Just color)) = Map.insert coord color acc
     addVertexIfColored acc (Tuple _ Nothing) = acc
 
@@ -78,8 +78,8 @@ cliques = Set.unions <<< map Set.fromFoldable $ [rowCoords, colCoords, blockCoor
 adjacentVertices :: Coord -> Set.Set Coord
 adjacentVertices coord = Set.delete coord <<< Set.unions <<< Set.filter (Set.member coord) $ cliques
 
-uncoloredVerticies :: Graph -> Set.Set Coord
+uncoloredVerticies :: PartialColoring -> Set.Set Coord
 uncoloredVerticies = Set.difference allCoords <<< Map.keys
 
-setVertexColor :: Coord -> VertexColor -> Graph -> Graph
+setVertexColor :: Coord -> VertexColor -> PartialColoring -> PartialColoring
 setVertexColor = Map.insert

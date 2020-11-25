@@ -1,6 +1,6 @@
 module Sudoku.Grid
   ( Grid
-  , fromGraph
+  , fromPartialColoring
   , showGrid
   ) where
 
@@ -14,15 +14,15 @@ import Effect.Exception.Unsafe (unsafeThrow)
 
 import Sudoku.VertexColor (VertexColor)
 import Sudoku.VertexColor as Color
-import Sudoku.PartialColoring (Graph)
+import Sudoku.PartialColoring (PartialColoring)
 
 type Grid = Array (Array (Maybe VertexColor))
 
-fromGraph :: Graph -> Grid
-fromGraph graph = map getRow $ 0 .. 8
+fromPartialColoring :: PartialColoring -> Grid
+fromPartialColoring coloring = map getRow $ 0 .. 8
   where
     getColor :: Int -> Int -> Maybe VertexColor
-    getColor i j = Map.lookup (Tuple i j) graph 
+    getColor i j = Map.lookup (Tuple i j) coloring 
 
     getRow :: Int -> Array (Maybe VertexColor)
     getRow i = map (getColor i) $ 0 .. 8

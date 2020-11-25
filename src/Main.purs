@@ -12,14 +12,14 @@ import Node.Process as Process
 import Node.ReadLine as ReadLine
 
 import Sudoku.VertexColor as Color
-import Sudoku.Grid (fromGraph, showGrid)
-import Sudoku.PartialColoring (Graph, from2dArray, setVertexColor)
+import Sudoku.Grid (fromPartialColoring, showGrid)
+import Sudoku.PartialColoring (PartialColoring, from2dArray, setVertexColor)
 import Sudoku.Solve (tryCrossHatch)
 
-printGraph :: Graph -> Effect Unit
-printGraph = log <<< showGrid <<< fromGraph
+printPartialColoring :: PartialColoring -> Effect Unit
+printPartialColoring = log <<< showGrid <<< fromPartialColoring
 
-suggestAndPrompt :: ReadLine.Interface -> Graph -> Effect Unit
+suggestAndPrompt :: ReadLine.Interface -> PartialColoring -> Effect Unit
 suggestAndPrompt interface graph = do
   let result = tryCrossHatch graph
   case result of
@@ -28,11 +28,11 @@ suggestAndPrompt interface graph = do
       Process.exit 0
     Just suggestion@(Tuple coord@(Tuple i j) color) -> do
       log $ "Suggestion: Fill cell (" <> show i <> "," <> show j <> ")" <> " with value " <> show (Color.toInt color)
-      let newGraph = setVertexColor coord color graph
-      printGraph newGraph
+      let newPartialColoring = setVertexColor coord color graph
+      printPartialColoring newPartialColoring
       log ""
       let handleLine line = if line == "y"
-                            then suggestAndPrompt interface newGraph
+                            then suggestAndPrompt interface newPartialColoring
                             else Process.exit 0
       ReadLine.question "Continue [yN]? " handleLine interface
 
@@ -48,7 +48,7 @@ main = do
                           ,[1, 9, 0, 0, 7, 0, 4, 6, 0]
                           ,[8, 7, 6, 3, 1, 0, 9, 0, 0]]
   log "Input:"
-  printGraph graph
+  printPartialColoring graph
   log ""
   interface <- ReadLine.createInterface Process.stdin $ ReadLine.output := Process.stdout
   suggestAndPrompt interface graph

@@ -11,7 +11,7 @@ import Data.Tuple (Tuple(..))
 import Data.Maybe (Maybe(..))
 
 import Sudoku.VertexColor (VertexColor(..))
-import Sudoku.Grid (fromGraph)
+import Sudoku.Grid (fromPartialColoring)
 
 testFromGraph :: Effect Unit
 testFromGraph = do
@@ -68,7 +68,7 @@ testFromGraph = do
                      ,[Nothing,Nothing,Nothing,Nothing,Nothing,(Just Nine),Nothing,(Just One),Nothing]
                      ,[(Just One),(Just Nine),Nothing,Nothing,(Just Seven),Nothing,(Just Four),(Just Six),Nothing]
                      ,[(Just Eight),(Just Seven),(Just Six),(Just Three),(Just One),Nothing,(Just Nine),Nothing,Nothing]]
-  assertEqual { expected: expectedGrid, actual: fromGraph graph }
+  assertEqual { expected: expectedGrid, actual: fromPartialColoring graph }
 
 testGrid :: Effect Unit
 testGrid = testFromGraph
