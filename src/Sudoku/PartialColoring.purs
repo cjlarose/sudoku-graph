@@ -1,4 +1,4 @@
-module Sudoku.Graph
+module Sudoku.PartialColoring
   ( Graph
   , Coord
   , from2dArray

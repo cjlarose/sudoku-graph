@@ -9,7 +9,7 @@ import Test.Assert (assertEqual)
 import Data.Maybe (Maybe(..))
 import Data.Tuple (Tuple(..))
 
-import Sudoku.Graph (from2dArray)
+import Sudoku.PartialColoring (from2dArray)
 import Sudoku.Solve (tryCrossHatch)
 import Sudoku.VertexColor (VertexColor(..))
 

@@ -14,7 +14,7 @@ import Effect.Exception.Unsafe (unsafeThrow)
 
 import Sudoku.VertexColor (VertexColor)
 import Sudoku.VertexColor as Color
-import Sudoku.Graph (Graph)
+import Sudoku.PartialColoring (Graph)
 
 type Grid = Array (Array (Maybe VertexColor))
 

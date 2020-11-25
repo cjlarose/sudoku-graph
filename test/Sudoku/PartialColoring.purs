@@ -1,5 +1,5 @@
-module Test.Sudoku.Graph
-  ( testGraph
+module Test.Sudoku.PartialColoring
+  ( testPartialColoring
   ) where
 
 import Prelude
@@ -12,7 +12,7 @@ import Data.Set as Set
 import Data.Tuple (Tuple(..))
 
 import Sudoku.VertexColor (VertexColor(..))
-import Sudoku.Graph (from2dArray, rowCoords, colCoords, blockCoords, cliques, adjacentVertices, uncoloredVerticies)
+import Sudoku.PartialColoring (from2dArray, rowCoords, colCoords, blockCoords, cliques, adjacentVertices, uncoloredVerticies)
 
 testFrom2dArray :: Effect Unit
 testFrom2dArray = do
@@ -251,8 +251,8 @@ testUncoloredVertices = do
                                            ,Tuple 8 8]
   assertEqual { expected: expectedUncolored, actual: uncoloredVerticies graph }
 
-testGraph :: Effect Unit
-testGraph = do
+testPartialColoring :: Effect Unit
+testPartialColoring = do
   testFrom2dArray
   testRowCoords
   testColCoords

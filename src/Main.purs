@@ -13,7 +13,7 @@ import Node.ReadLine as ReadLine
 
 import Sudoku.VertexColor as Color
 import Sudoku.Grid (fromGraph, showGrid)
-import Sudoku.Graph (Graph, from2dArray, setVertexColor)
+import Sudoku.PartialColoring (Graph, from2dArray, setVertexColor)
 import Sudoku.Solve (tryCrossHatch)
 
 printGraph :: Graph -> Effect Unit

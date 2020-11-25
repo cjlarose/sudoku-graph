@@ -12,7 +12,7 @@ import Data.Array as Array
 import Data.Array (findMap)
 
 import Sudoku.VertexColor (VertexColor, allColors)
-import Sudoku.Graph (Graph, Coord, cliques, adjacentVertices, uncoloredVerticies)
+import Sudoku.PartialColoring (Graph, Coord, cliques, adjacentVertices, uncoloredVerticies)
 
 -- Typically, crosshatching is identifying, within a block, a unique cell where
 -- a given candidate can be assigned cells within a block are eliminated if
