@@ -14,9 +14,12 @@ import Sudoku.VertexColor (VertexColor)
 import Sudoku.Grid (fromPartialColoring, showGrid)
 import Sudoku.PartialColoring (PartialColoring, Coord)
 import Sudoku.PartialColoring as PC
+import Sudoku.CandidateAnnotations (CandidateAnnotations)
+import Sudoku.CandidateAnnotations as CA
 
 newtype Worksheet = Worksheet PartialColoring
-newtype AnnotatedWorksheet = AnnotatedWorksheet PartialColoring
+newtype AnnotatedWorksheet = AnnotatedWorksheet { coloring :: PartialColoring
+                                                , annotations :: CandidateAnnotations }
 
 from2dArray :: Array (Array Int) -> Worksheet
 from2dArray = Worksheet <<< PC.from2dArray
@@ -28,7 +31,8 @@ showWorksheet :: Worksheet -> String
 showWorksheet (Worksheet coloring) = showGrid <<< fromPartialColoring $ coloring
 
 showAnnotatedWorksheet :: AnnotatedWorksheet -> String
-showAnnotatedWorksheet (AnnotatedWorksheet coloring) = showGrid <<< fromPartialColoring $ coloring
+showAnnotatedWorksheet (AnnotatedWorksheet worksheet) = showGrid <<< fromPartialColoring $ worksheet.coloring
 
 addAnnotations :: Worksheet -> AnnotatedWorksheet
-addAnnotations (Worksheet coloring) = AnnotatedWorksheet coloring
+addAnnotations (Worksheet coloring) = AnnotatedWorksheet { coloring: coloring
+                                                         , annotations: CA.fromPartialColoring $ coloring }
