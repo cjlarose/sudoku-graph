@@ -12,12 +12,11 @@ import Node.Process as Process
 import Node.ReadLine as ReadLine
 
 import Sudoku.VertexColor as Color
-import Sudoku.Grid (fromPartialColoring, showGrid)
-import Sudoku.Worksheet (Worksheet(..), from2dArray, setVertexColor)
+import Sudoku.Worksheet (Worksheet(..), from2dArray, setVertexColor, showWorksheet)
 import Sudoku.Solve (tryCrossHatch)
 
 printWorksheet :: Worksheet -> Effect Unit
-printWorksheet (Worksheet coloring) = log <<< showGrid <<< fromPartialColoring $ coloring
+printWorksheet = log <<< showWorksheet
 
 suggestAndPrompt :: ReadLine.Interface -> Worksheet -> Effect Unit
 suggestAndPrompt interface worksheet@(Worksheet coloring) = do
