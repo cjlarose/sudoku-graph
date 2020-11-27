@@ -1,5 +1,5 @@
 module Sudoku.CandidateAnnotations
-  ( CandidateAnnotations
+  ( CandidateAnnotations(..)
   , fromPartialColoring
   ) where
 
@@ -7,10 +7,15 @@ import Prelude
 
 import Data.Map as Map
 import Data.Set as Set
+import Data.Tuple (Tuple(..))
 
-import Sudoku.PartialColoring (PartialColoring, Coord)
+import Sudoku.PartialColoring (PartialColoring, Coord, adjacentVertices, uncoloredVerticies, getVertexColor)
+import Sudoku.VertexColor (VertexColor, allColors)
 
-newtype CandidateAnnotations = CandidateAnnotations (Map.Map Coord (Set.Set Coord))
+newtype CandidateAnnotations = CandidateAnnotations (Map.Map Coord (Set.Set VertexColor))
 
 fromPartialColoring :: PartialColoring -> CandidateAnnotations
-fromPartialColoring coloring = CandidateAnnotations Map.empty
+fromPartialColoring coloring = CandidateAnnotations <<< Map.fromFoldable <<< Set.map (\v -> Tuple v $ candidates v) <<< uncoloredVerticies $ coloring
+  where
+    candidates :: Coord -> Set.Set VertexColor
+    candidates = Set.difference allColors <<< Set.mapMaybe (\v -> getVertexColor v coloring) <<< adjacentVertices
