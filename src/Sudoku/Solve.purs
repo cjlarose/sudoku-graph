@@ -6,14 +6,13 @@ import Prelude
 
 import Data.Maybe (Maybe(..))
 import Data.Tuple (Tuple(..))
-import Data.Map as Map
 import Data.Set as Set
 import Data.Array as Array
 import Data.Array (findMap)
 
 import Sudoku.VertexColor (VertexColor, allColors)
 import Sudoku.PartialColoring (PartialColoring, Coord, cliques, uncoloredVerticies)
-import Sudoku.CandidateAnnotations (CandidateAnnotations(..), fromPartialColoring)
+import Sudoku.CandidateAnnotations (CandidateAnnotations, fromPartialColoring, candidatesForCoord)
 
 -- Typically, crosshatching is identifying, within a block, a unique cell where
 -- a given candidate can be assigned cells within a block are eliminated if
@@ -36,9 +35,8 @@ import Sudoku.CandidateAnnotations (CandidateAnnotations(..), fromPartialColorin
 tryCrossHatch :: PartialColoring -> Maybe (Tuple Coord VertexColor)
 tryCrossHatch coloring = findMap findColoringInClique <<< Array.fromFoldable $ cliques
   where
-    uncoloredVertexCandidates :: Map.Map Coord (Set.Set VertexColor)
-    uncoloredVertexCandidates = annotations
-      where (CandidateAnnotations annotations) = fromPartialColoring coloring
+    uncoloredVertexCandidates :: CandidateAnnotations
+    uncoloredVertexCandidates = fromPartialColoring coloring
 
     findColoringInClique :: Set.Set Coord -> Maybe (Tuple Coord VertexColor)
     findColoringInClique clique = findMap findSuggestion allColors
@@ -46,7 +44,7 @@ tryCrossHatch coloring = findMap findColoringInClique <<< Array.fromFoldable $ c
         uncoloredInClique = Set.intersection clique $ uncoloredVerticies coloring
 
         hasColorAsCandidate :: VertexColor -> Coord -> Boolean
-        hasColorAsCandidate color coord = case Map.lookup coord uncoloredVertexCandidates of
+        hasColorAsCandidate color coord = case candidatesForCoord coord uncoloredVertexCandidates of
                                             Just colors -> Set.member color colors
                                             Nothing -> false
 
