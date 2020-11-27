@@ -31,15 +31,6 @@ suggestAndPrompt :: ReadLine.Interface -> Worksheet -> Effect Unit
 suggestAndPrompt interface worksheet@(Worksheet coloring) = do
   let result = tryCrossHatch coloring
   case result of
-    Nothing -> do
-      log "Add candidate annotations for every cell"
-      let newWorksheet = addAnnotations worksheet
-      printAnnotatedWorksheet newWorksheet
-      log ""
-      let handleLine line = if line == "y"
-                            then suggestAndPromptWithAnnotations interface newWorksheet
-                            else Process.exit 0
-      ReadLine.question "Continue [yN]? " handleLine interface
     Just suggestion@(Tuple coord@(Tuple i j) color) -> do
       log $ "Suggestion: Fill cell (" <> show i <> "," <> show j <> ")" <> " with value " <> show (Color.toInt color)
       let newWorksheet = setVertexColor coord color worksheet
@@ -54,6 +45,15 @@ suggestAndPrompt interface worksheet@(Worksheet coloring) = do
                               then suggestAndPrompt interface newWorksheet
                               else Process.exit 0
         ReadLine.question "Continue [yN]? " handleLine interface
+    Nothing -> do
+      log "Add candidate annotations for every cell"
+      let newWorksheet = addAnnotations worksheet
+      printAnnotatedWorksheet newWorksheet
+      log ""
+      let handleLine line = if line == "y"
+                            then suggestAndPromptWithAnnotations interface newWorksheet
+                            else Process.exit 0
+      ReadLine.question "Continue [yN]? " handleLine interface
 
 main :: Effect Unit
 main = do
