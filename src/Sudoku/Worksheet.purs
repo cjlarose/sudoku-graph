@@ -32,7 +32,10 @@ showWorksheet :: Worksheet -> String
 showWorksheet (Worksheet coloring) = showGrid <<< fromPartialColoring $ coloring
 
 showAnnotatedWorksheet :: AnnotatedWorksheet -> String
-showAnnotatedWorksheet (AnnotatedWorksheet worksheet) = showGrid <<< fromPartialColoring $ worksheet.coloring
+showAnnotatedWorksheet (AnnotatedWorksheet worksheet) = coloringString <> "\n" <> candidateString
+  where
+    coloringString = showGrid <<< fromPartialColoring $ worksheet.coloring
+    candidateString = CA.showCandidates worksheet.annotations
 
 addAnnotations :: Worksheet -> AnnotatedWorksheet
 addAnnotations (Worksheet coloring) = AnnotatedWorksheet { coloring: coloring

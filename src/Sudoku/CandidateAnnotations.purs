@@ -2,6 +2,7 @@ module Sudoku.CandidateAnnotations
   ( CandidateAnnotations
   , fromPartialColoring
   , candidatesForCoord
+  , showCandidates
   ) where
 
 import Prelude
@@ -10,9 +11,10 @@ import Data.Map as Map
 import Data.Set as Set
 import Data.Tuple (Tuple(..))
 import Data.Maybe (Maybe)
+import Data.String (joinWith)
 
 import Sudoku.PartialColoring (PartialColoring, Coord, adjacentVertices, uncoloredVerticies, getVertexColor)
-import Sudoku.VertexColor (VertexColor, allColors)
+import Sudoku.VertexColor (VertexColor, allColors, toInt)
 
 newtype CandidateAnnotations = CandidateAnnotations (Map.Map Coord (Set.Set VertexColor))
 
@@ -24,3 +26,12 @@ fromPartialColoring coloring = CandidateAnnotations <<< Map.fromFoldable <<< Set
 
 candidatesForCoord :: Coord -> CandidateAnnotations -> Maybe (Set.Set VertexColor)
 candidatesForCoord coord (CandidateAnnotations annotations) = Map.lookup coord annotations
+
+showCandidates :: CandidateAnnotations -> String
+showCandidates (CandidateAnnotations annotations) = joinWith "\n" <<< map showAnnotation <<< Map.toUnfoldable $ annotations
+  where
+    showColors :: Set.Set VertexColor -> String
+    showColors = joinWith ", " <<< Set.toUnfoldable <<< Set.map (show <<< toInt)
+
+    showAnnotation :: Tuple Coord (Set.Set VertexColor) -> String
+    showAnnotation (Tuple (Tuple i j) candidates) = "candidates(" <> show i <> ", " <> show j <> ") = { " <> showColors candidates <> " } "
