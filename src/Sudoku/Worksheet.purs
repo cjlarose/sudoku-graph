@@ -3,10 +3,12 @@ module Sudoku.Worksheet
   , AnnotatedWorksheet(..)
   , from2dArray
   , setVertexColor
+  , setVertexColorWithAnnotations
   , showWorksheet
   , showAnnotatedWorksheet
   , addAnnotations
   , complete
+  , completeWithAnnotations
   ) where
 
 import Prelude
@@ -28,6 +30,12 @@ from2dArray = Worksheet <<< PC.from2dArray
 setVertexColor :: Coord -> VertexColor -> Worksheet -> Worksheet
 setVertexColor coord color (Worksheet coloring) = Worksheet <<< PC.setVertexColor coord color $ coloring
 
+setVertexColorWithAnnotations :: Coord -> VertexColor -> AnnotatedWorksheet -> AnnotatedWorksheet
+setVertexColorWithAnnotations coord color (AnnotatedWorksheet ws) = AnnotatedWorksheet { coloring: newColoring, annotations: newAnnotations }
+  where
+    newColoring = PC.setVertexColor coord color ws.coloring
+    newAnnotations = CA.removeCandidates coord color ws.annotations
+
 showWorksheet :: Worksheet -> String
 showWorksheet (Worksheet coloring) = showGrid <<< fromPartialColoring $ coloring
 
@@ -43,3 +51,6 @@ addAnnotations (Worksheet coloring) = AnnotatedWorksheet { coloring: coloring
 
 complete :: Worksheet -> Boolean
 complete (Worksheet coloring) = PC.complete coloring
+
+completeWithAnnotations :: AnnotatedWorksheet -> Boolean
+completeWithAnnotations (AnnotatedWorksheet ws) = PC.complete ws.coloring

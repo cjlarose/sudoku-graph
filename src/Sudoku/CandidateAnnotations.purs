@@ -3,6 +3,7 @@ module Sudoku.CandidateAnnotations
   , fromPartialColoring
   , candidatesForCoord
   , showCandidates
+  , removeCandidates
   ) where
 
 import Prelude
@@ -10,7 +11,7 @@ import Prelude
 import Data.Map as Map
 import Data.Set as Set
 import Data.Tuple (Tuple(..))
-import Data.Maybe (Maybe)
+import Data.Maybe (Maybe(..))
 import Data.String (joinWith)
 
 import Sudoku.PartialColoring (PartialColoring, Coord, adjacentVertices, uncoloredVerticies, getVertexColor)
@@ -35,3 +36,15 @@ showCandidates (CandidateAnnotations annotations) = joinWith "\n" <<< map showAn
 
     showAnnotation :: Tuple Coord (Set.Set VertexColor) -> String
     showAnnotation (Tuple (Tuple i j) candidates) = "candidates(" <> show i <> ", " <> show j <> ") = { " <> showColors candidates <> " } "
+
+removeCandidates :: Coord -> VertexColor -> CandidateAnnotations -> CandidateAnnotations
+removeCandidates coord color (CandidateAnnotations annotations) = CandidateAnnotations newAnnotations
+  where
+    neighbors :: Set.Set Coord
+    neighbors = adjacentVertices coord
+
+    updates :: Map.Map Coord (Set.Set VertexColor)
+    updates = Map.mapMaybe (Just <<< Set.delete color) <<< Map.filterKeys (\v -> v `Set.member` neighbors) $ annotations
+
+    newAnnotations :: Map.Map Coord (Set.Set VertexColor)
+    newAnnotations = Map.delete coord <<< Map.union updates $ annotations
