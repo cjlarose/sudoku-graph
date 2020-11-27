@@ -12,19 +12,33 @@ import Node.Process as Process
 import Node.ReadLine as ReadLine
 
 import Sudoku.VertexColor as Color
-import Sudoku.Worksheet (Worksheet(..), from2dArray, setVertexColor, showWorksheet)
+import Sudoku.Worksheet (Worksheet(..), AnnotatedWorksheet(..), from2dArray, setVertexColor, showWorksheet, showAnnotatedWorksheet, addAnnotations)
 import Sudoku.Solve (tryCrossHatch)
 
 printWorksheet :: Worksheet -> Effect Unit
 printWorksheet = log <<< showWorksheet
+
+printAnnotatedWorksheet :: AnnotatedWorksheet -> Effect Unit
+printAnnotatedWorksheet = log <<< showAnnotatedWorksheet
+
+suggestAndPromptWithAnnotations :: ReadLine.Interface -> AnnotatedWorksheet -> Effect Unit
+suggestAndPromptWithAnnotations interface worksheet@(AnnotatedWorksheet coloring) = do
+  log "Just do it"
+  Process.exit 0
 
 suggestAndPrompt :: ReadLine.Interface -> Worksheet -> Effect Unit
 suggestAndPrompt interface worksheet@(Worksheet coloring) = do
   let result = tryCrossHatch coloring
   case result of
     Nothing -> do
-      log "No suggestion"
-      Process.exit 0
+      log "Add candidate annotations for every cell"
+      let newWorksheet = addAnnotations worksheet
+      printAnnotatedWorksheet newWorksheet
+      log ""
+      let handleLine line = if line == "y"
+                            then suggestAndPromptWithAnnotations interface newWorksheet
+                            else Process.exit 0
+      ReadLine.question "Continue [yN]? " handleLine interface
     Just suggestion@(Tuple coord@(Tuple i j) color) -> do
       log $ "Suggestion: Fill cell (" <> show i <> "," <> show j <> ")" <> " with value " <> show (Color.toInt color)
       let newWorksheet = setVertexColor coord color worksheet
