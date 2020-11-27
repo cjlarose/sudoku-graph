@@ -11,8 +11,6 @@ module Sudoku.Worksheet
 
 import Prelude
 
-import Data.Set as Set
-
 import Sudoku.VertexColor (VertexColor)
 import Sudoku.Grid (fromPartialColoring, showGrid)
 import Sudoku.PartialColoring (PartialColoring, Coord)
