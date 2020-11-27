@@ -10,6 +10,7 @@ module Sudoku.PartialColoring
   , uncoloredVerticies
   , getVertexColor
   , setVertexColor
+  , complete
   ) where
 
 import Prelude
@@ -95,3 +96,6 @@ getVertexColor coord (PartialColoring coloring) = Map.lookup coord coloring
 
 setVertexColor :: Coord -> VertexColor -> PartialColoring -> PartialColoring
 setVertexColor coord color (PartialColoring coloring) = PartialColoring <<< Map.insert coord color $ coloring
+
+complete :: PartialColoring -> Boolean
+complete (PartialColoring coloring) = Set.isEmpty <<< Set.difference allCoords <<< Map.keys $ coloring

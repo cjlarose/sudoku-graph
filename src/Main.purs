@@ -12,6 +12,7 @@ import Node.Process as Process
 import Node.ReadLine as ReadLine
 
 import Sudoku.VertexColor as Color
+import Sudoku.Worksheet as Worksheet
 import Sudoku.Worksheet (Worksheet(..), AnnotatedWorksheet(..), from2dArray, setVertexColor, showWorksheet, showAnnotatedWorksheet, addAnnotations)
 import Sudoku.Solve (tryCrossHatch)
 
@@ -43,11 +44,16 @@ suggestAndPrompt interface worksheet@(Worksheet coloring) = do
       log $ "Suggestion: Fill cell (" <> show i <> "," <> show j <> ")" <> " with value " <> show (Color.toInt color)
       let newWorksheet = setVertexColor coord color worksheet
       printWorksheet newWorksheet
-      log ""
-      let handleLine line = if line == "y"
-                            then suggestAndPrompt interface newWorksheet
-                            else Process.exit 0
-      ReadLine.question "Continue [yN]? " handleLine interface
+      if Worksheet.complete newWorksheet
+      then do
+        log "Puzzle complete!"
+        Process.exit 0
+      else do
+        log ""
+        let handleLine line = if line == "y"
+                              then suggestAndPrompt interface newWorksheet
+                              else Process.exit 0
+        ReadLine.question "Continue [yN]? " handleLine interface
 
 main :: Effect Unit
 main = do
@@ -62,6 +68,11 @@ main = do
                               ,[8, 7, 6, 3, 1, 0, 9, 0, 0]]
   log "Input:"
   printWorksheet worksheet
-  log ""
-  interface <- ReadLine.createInterface Process.stdin $ ReadLine.output := Process.stdout
-  suggestAndPrompt interface worksheet
+  if Worksheet.complete worksheet
+  then do
+    log "Puzzle complete!"
+    Process.exit 0
+  else do
+    log ""
+    interface <- ReadLine.createInterface Process.stdin $ ReadLine.output := Process.stdout
+    suggestAndPrompt interface worksheet

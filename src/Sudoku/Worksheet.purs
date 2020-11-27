@@ -6,9 +6,12 @@ module Sudoku.Worksheet
   , showWorksheet
   , showAnnotatedWorksheet
   , addAnnotations
+  , complete
   ) where
 
 import Prelude
+
+import Data.Set as Set
 
 import Sudoku.VertexColor (VertexColor)
 import Sudoku.Grid (fromPartialColoring, showGrid)
@@ -36,3 +39,6 @@ showAnnotatedWorksheet (AnnotatedWorksheet worksheet) = showGrid <<< fromPartial
 addAnnotations :: Worksheet -> AnnotatedWorksheet
 addAnnotations (Worksheet coloring) = AnnotatedWorksheet { coloring: coloring
                                                          , annotations: CA.fromPartialColoring $ coloring }
+
+complete :: Worksheet -> Boolean
+complete (Worksheet coloring) = PC.complete coloring
