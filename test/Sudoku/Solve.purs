@@ -50,8 +50,8 @@ testCrossHatchReturnsSuggestionForColumn = do
                           ,[0, 0, 0, 3, 0, 0, 0, 0, 0]
                           ,[0, 0, 0, 6, 0, 0, 0, 0, 0]
                           ,[0, 0, 0, 0, 0, 0, 0, 0, 0]
-                          ,[0, 0, 0, 4, 0, 0, 0, 0, 0]
-                          ,[0, 0, 0, 2, 0, 0, 0, 0, 0]
+                          ,[0, 0, 0, 0, 0, 0, 8, 0, 0]
+                          ,[0, 0, 8, 0, 0, 0, 0, 0, 0]
                           ,[0, 0, 0, 9, 0, 0, 0, 0, 0]
                           ,[0, 0, 0, 5, 0, 0, 0, 0, 0]]
   let expectedSuggestion = Just (Tuple (Tuple 4 3) Eight)
@@ -60,12 +60,12 @@ testCrossHatchReturnsSuggestionForColumn = do
 testCrossHatchReturnsSuggestionForRow :: Effect Unit
 testCrossHatchReturnsSuggestionForRow = do
   let graph = from2dArray [[0, 0, 0, 0, 0, 0, 0, 0, 0]
+                          ,[0, 4, 0, 0, 0, 0, 0, 0, 0]
+                          ,[0, 0, 0, 4, 0, 0, 0, 0, 0]
                           ,[0, 0, 0, 0, 0, 0, 0, 0, 0]
                           ,[0, 0, 0, 0, 0, 0, 0, 0, 0]
                           ,[0, 0, 0, 0, 0, 0, 0, 0, 0]
-                          ,[0, 0, 0, 0, 0, 0, 0, 0, 0]
-                          ,[0, 0, 0, 0, 0, 0, 0, 0, 0]
-                          ,[7, 1, 6, 3, 5, 2, 0, 9, 8]
+                          ,[7, 0, 6, 0, 5, 2, 0, 9, 8]
                           ,[0, 0, 0, 0, 0, 0, 0, 0, 0]
                           ,[0, 0, 0, 0, 0, 0, 0, 0, 0]]
   let expectedSuggestion = Just (Tuple (Tuple 6 6) Four)
