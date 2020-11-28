@@ -61,7 +61,6 @@ tryCrossHatch coloring = findMap findColoringInClique <<< Array.fromFoldable $ c
 -- the sole candidate
 tryNakedSingle :: AnnotatedWorksheet -> Maybe (Tuple Coord VertexColor)
 tryNakedSingle (AnnotatedWorksheet ws) = do
-   res <- CA.find ((==) 1 <<< Set.size) ws.annotations
-   let (Tuple coord colors) = res
+   Tuple coord colors <- CA.find ((==) 1 <<< Set.size) ws.annotations
    color <- Set.findMin colors
    pure $ Tuple coord color
