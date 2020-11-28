@@ -27,7 +27,7 @@ suggestAndPromptWithAnnotations interface worksheet@(AnnotatedWorksheet ws) = do
   let result = findCrossHatch ws.coloring
   case result of
     Just suggestion@(Tuple coord@(Tuple i j) color) -> do
-      log $ "Suggestion: Fill cell (" <> show i <> "," <> show j <> ")" <> " with value " <> show (Color.toInt color)
+      log $ "Suggestion (Cross Hatching): Fill cell (" <> show i <> "," <> show j <> ")" <> " with value " <> show (Color.toInt color)
       let newWorksheet = setVertexColorWithAnnotations coord color worksheet
       printAnnotatedWorksheet newWorksheet
       if Worksheet.completeWithAnnotations newWorksheet
@@ -66,7 +66,7 @@ suggestAndPrompt interface worksheet@(Worksheet coloring) = do
   let result = findCrossHatch coloring
   case result of
     Just suggestion@(Tuple coord@(Tuple i j) color) -> do
-      log $ "Suggestion: Fill cell (" <> show i <> "," <> show j <> ")" <> " with value " <> show (Color.toInt color)
+      log $ "Suggestion (Cross Hatching): Fill cell (" <> show i <> "," <> show j <> ")" <> " with value " <> show (Color.toInt color)
       let newWorksheet = setVertexColor coord color worksheet
       printWorksheet newWorksheet
       if Worksheet.complete newWorksheet
