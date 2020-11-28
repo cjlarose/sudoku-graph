@@ -53,15 +53,15 @@ findNakedSingle (AnnotatedWorksheet ws) = do
 findHiddenSingle :: AnnotatedWorksheet -> Maybe (Tuple Coord VertexColor)
 findHiddenSingle (AnnotatedWorksheet ws) = findMap findColoringInClique <<< Array.fromFoldable $ cliques
   where
+    hasColorAsCandidate :: VertexColor -> Coord -> Boolean
+    hasColorAsCandidate color coord = case candidatesForCoord coord ws.annotations of
+                                        Just colors -> Set.member color colors
+                                        Nothing -> false
+
     findColoringInClique :: Set.Set Coord -> Maybe (Tuple Coord VertexColor)
     findColoringInClique clique = findMap findSuggestion allColors
       where
         uncoloredInClique = Set.intersection clique $ uncoloredVerticies ws.coloring
-
-        hasColorAsCandidate :: VertexColor -> Coord -> Boolean
-        hasColorAsCandidate color coord = case candidatesForCoord coord ws.annotations of
-                                            Just colors -> Set.member color colors
-                                            Nothing -> false
 
         findSuggestion :: VertexColor -> Maybe (Tuple Coord VertexColor)
         findSuggestion color = case Array.fromFoldable <<< Set.filter (hasColorAsCandidate color) $ uncoloredInClique of
