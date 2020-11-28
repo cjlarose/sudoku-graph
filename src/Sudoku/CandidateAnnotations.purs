@@ -4,6 +4,7 @@ module Sudoku.CandidateAnnotations
   , candidatesForCoord
   , showCandidates
   , removeCandidates
+  , find
   ) where
 
 import Prelude
@@ -48,3 +49,8 @@ removeCandidates coord color (CandidateAnnotations annotations) = CandidateAnnot
 
     newAnnotations :: Map.Map Coord (Set.Set VertexColor)
     newAnnotations = Map.delete coord <<< Map.union updates $ annotations
+
+find :: (Set.Set VertexColor -> Boolean) -> CandidateAnnotations -> Maybe (Tuple Coord (Set.Set VertexColor))
+find f (CandidateAnnotations annotations) = do
+  { key: coord, value: colors } <- Map.findMin <<< Map.filter f $ annotations
+  pure $ Tuple coord colors

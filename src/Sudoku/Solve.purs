@@ -1,5 +1,6 @@
 module Sudoku.Solve
   ( tryCrossHatch
+  , tryNakedSingle
   ) where
 
 import Prelude
@@ -13,6 +14,8 @@ import Data.Array (findMap)
 import Sudoku.VertexColor (VertexColor, allColors)
 import Sudoku.PartialColoring (PartialColoring, Coord, cliques, uncoloredVerticies)
 import Sudoku.CandidateAnnotations (CandidateAnnotations, fromPartialColoring, candidatesForCoord)
+import Sudoku.CandidateAnnotations as CA
+import Sudoku.Worksheet (AnnotatedWorksheet(..))
 
 -- Typically, crosshatching is identifying, within a block, a unique cell where
 -- a given candidate can be assigned cells within a block are eliminated if
@@ -52,3 +55,13 @@ tryCrossHatch coloring = findMap findColoringInClique <<< Array.fromFoldable $ c
         findSuggestion color = case Array.fromFoldable <<< Set.filter (hasColorAsCandidate color) $ uncoloredInClique of
                                  [coord] -> Just $ Tuple coord color
                                  _ -> Nothing
+
+-- A naked single is any candidate set of cardinality 1
+-- Since only one candidate can go in that position, we fill that position with
+-- the sole candidate
+tryNakedSingle :: AnnotatedWorksheet -> Maybe (Tuple Coord VertexColor)
+tryNakedSingle (AnnotatedWorksheet ws) = do
+   res <- CA.find ((==) 1 <<< Set.size) ws.annotations
+   let (Tuple coord colors) = res
+   color <- Set.findMin colors
+   pure $ Tuple coord color

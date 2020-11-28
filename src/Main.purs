@@ -14,7 +14,7 @@ import Node.ReadLine as ReadLine
 import Sudoku.VertexColor as Color
 import Sudoku.Worksheet as Worksheet
 import Sudoku.Worksheet (Worksheet(..), AnnotatedWorksheet(..), from2dArray, setVertexColor, setVertexColorWithAnnotations, showWorksheet, showAnnotatedWorksheet, addAnnotations)
-import Sudoku.Solve (tryCrossHatch)
+import Sudoku.Solve (tryCrossHatch, tryNakedSingle)
 
 printWorksheet :: Worksheet -> Effect Unit
 printWorksheet = log <<< showWorksheet
@@ -41,8 +41,25 @@ suggestAndPromptWithAnnotations interface worksheet@(AnnotatedWorksheet ws) = do
                               else Process.exit 0
         ReadLine.question "Continue [yN]? " handleLine interface
     Nothing -> do
-      log "Just do it"
-      Process.exit 0
+      let nakedSingle = tryNakedSingle worksheet
+      case nakedSingle of
+        Just suggestion@(Tuple coord@(Tuple i j) color) -> do
+          log $ "Suggestion (Naked Single): Fill cell (" <> show i <> "," <> show j <> ")" <> " with value " <> show (Color.toInt color)
+          let newWorksheet = setVertexColorWithAnnotations coord color worksheet
+          printAnnotatedWorksheet newWorksheet
+          if Worksheet.completeWithAnnotations newWorksheet
+          then do
+            log "Puzzle complete!"
+            Process.exit 0
+          else do
+            log ""
+            let handleLine line = if line == "y"
+                                  then suggestAndPromptWithAnnotations interface newWorksheet
+                                  else Process.exit 0
+            ReadLine.question "Continue [yN]? " handleLine interface
+        Nothing -> do
+          log "No suggestion"
+          Process.exit 0
 
 suggestAndPrompt :: ReadLine.Interface -> Worksheet -> Effect Unit
 suggestAndPrompt interface worksheet@(Worksheet coloring) = do
