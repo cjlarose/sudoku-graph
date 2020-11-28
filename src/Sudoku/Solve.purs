@@ -1,6 +1,7 @@
 module Sudoku.Solve
   ( findCrossHatch
   , findNakedSingle
+  , findHiddenSingle
   ) where
 
 import Prelude
@@ -64,3 +65,26 @@ findNakedSingle (AnnotatedWorksheet ws) = do
    Tuple coord colors <- CA.find ((==) 1 <<< Set.size) ws.annotations
    color <- Set.findMin colors
    pure $ Tuple coord color
+
+-- If a candidate color appears only once within any house (9-clique), that
+-- cell must be colored with that candidate color
+findHiddenSingle :: AnnotatedWorksheet -> Maybe (Tuple Coord VertexColor)
+findHiddenSingle (AnnotatedWorksheet ws) = findMap findColoringInClique <<< Array.fromFoldable $ cliques
+  where
+    uncoloredVertexCandidates :: CandidateAnnotations
+    uncoloredVertexCandidates = ws.annotations
+
+    findColoringInClique :: Set.Set Coord -> Maybe (Tuple Coord VertexColor)
+    findColoringInClique clique = findMap findSuggestion allColors
+      where
+        uncoloredInClique = Set.intersection clique $ uncoloredVerticies ws.coloring
+
+        hasColorAsCandidate :: VertexColor -> Coord -> Boolean
+        hasColorAsCandidate color coord = case candidatesForCoord coord uncoloredVertexCandidates of
+                                            Just colors -> Set.member color colors
+                                            Nothing -> false
+
+        findSuggestion :: VertexColor -> Maybe (Tuple Coord VertexColor)
+        findSuggestion color = case Array.fromFoldable <<< Set.filter (hasColorAsCandidate color) $ uncoloredInClique of
+                                 [coord] -> Just $ Tuple coord color
+                                 _ -> Nothing
