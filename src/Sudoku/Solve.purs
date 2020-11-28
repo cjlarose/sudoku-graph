@@ -14,9 +14,9 @@ import Data.Array (findMap)
 
 import Sudoku.VertexColor (VertexColor, allColors)
 import Sudoku.PartialColoring (PartialColoring, Coord, cliques, uncoloredVerticies)
-import Sudoku.CandidateAnnotations (CandidateAnnotations, fromPartialColoring, candidatesForCoord)
+import Sudoku.CandidateAnnotations (CandidateAnnotations, candidatesForCoord)
 import Sudoku.CandidateAnnotations as CA
-import Sudoku.Worksheet (AnnotatedWorksheet(..))
+import Sudoku.Worksheet (Worksheet(..), AnnotatedWorksheet(..), addAnnotations)
 
 -- Typically, crosshatching is identifying, within a block, a unique cell where
 -- a given candidate can be assigned cells within a block are eliminated if
@@ -37,25 +37,7 @@ import Sudoku.Worksheet (AnnotatedWorksheet(..))
 --     compute the subset of uncolored vertices that have the color as a candidate
 --     if the size of that subset is 1, color that vertex
 findCrossHatch :: PartialColoring -> Maybe (Tuple Coord VertexColor)
-findCrossHatch coloring = findMap findColoringInClique <<< Array.fromFoldable $ cliques
-  where
-    uncoloredVertexCandidates :: CandidateAnnotations
-    uncoloredVertexCandidates = fromPartialColoring coloring
-
-    findColoringInClique :: Set.Set Coord -> Maybe (Tuple Coord VertexColor)
-    findColoringInClique clique = findMap findSuggestion allColors
-      where
-        uncoloredInClique = Set.intersection clique $ uncoloredVerticies coloring
-
-        hasColorAsCandidate :: VertexColor -> Coord -> Boolean
-        hasColorAsCandidate color coord = case candidatesForCoord coord uncoloredVertexCandidates of
-                                            Just colors -> Set.member color colors
-                                            Nothing -> false
-
-        findSuggestion :: VertexColor -> Maybe (Tuple Coord VertexColor)
-        findSuggestion color = case Array.fromFoldable <<< Set.filter (hasColorAsCandidate color) $ uncoloredInClique of
-                                 [coord] -> Just $ Tuple coord color
-                                 _ -> Nothing
+findCrossHatch = findHiddenSingle <<< addAnnotations <<< Worksheet
 
 -- A naked single is any candidate set of cardinality 1
 -- Since only one candidate can go in that position, we fill that position with
