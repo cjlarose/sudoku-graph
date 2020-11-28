@@ -10,7 +10,7 @@ import Data.Maybe (Maybe(..))
 import Data.Tuple (Tuple(..))
 
 import Sudoku.PartialColoring (from2dArray)
-import Sudoku.Solve (tryCrossHatch)
+import Sudoku.Solve (findCrossHatch)
 import Sudoku.VertexColor (VertexColor(..))
 
 testCrossHatchReturnsNothingWhenNoneAvailable :: Effect Unit
@@ -25,7 +25,7 @@ testCrossHatchReturnsNothingWhenNoneAvailable = do
                           ,[0, 0, 0, 0, 0, 0, 0, 0, 3]
                           ,[0, 0, 0, 3, 0, 0, 0, 0, 0]]
   let expectedSuggestion = Nothing
-  assertEqual { expected: expectedSuggestion, actual: tryCrossHatch graph }
+  assertEqual { expected: expectedSuggestion, actual: findCrossHatch graph }
 
 testCrossHatchReturnsSuggestionForBlock :: Effect Unit
 testCrossHatchReturnsSuggestionForBlock = do
@@ -39,7 +39,7 @@ testCrossHatchReturnsSuggestionForBlock = do
                           ,[0, 0, 0, 0, 0, 0, 0, 0, 0]
                           ,[0, 0, 0, 3, 0, 0, 0, 0, 0]]
   let expectedSuggestion = Just (Tuple (Tuple 7 8) Three)
-  assertEqual { expected: expectedSuggestion, actual: tryCrossHatch graph }
+  assertEqual { expected: expectedSuggestion, actual: findCrossHatch graph }
 
 testCrossHatchReturnsSuggestionForColumn :: Effect Unit
 testCrossHatchReturnsSuggestionForColumn = do
@@ -53,7 +53,7 @@ testCrossHatchReturnsSuggestionForColumn = do
                           ,[0, 0, 0, 9, 0, 0, 0, 0, 0]
                           ,[0, 0, 0, 5, 0, 0, 0, 0, 0]]
   let expectedSuggestion = Just (Tuple (Tuple 4 3) Eight)
-  assertEqual { expected: expectedSuggestion, actual: tryCrossHatch graph }
+  assertEqual { expected: expectedSuggestion, actual: findCrossHatch graph }
 
 testCrossHatchReturnsSuggestionForRow :: Effect Unit
 testCrossHatchReturnsSuggestionForRow = do
@@ -67,7 +67,7 @@ testCrossHatchReturnsSuggestionForRow = do
                           ,[0, 0, 0, 0, 0, 0, 0, 0, 0]
                           ,[0, 0, 0, 0, 0, 0, 0, 0, 0]]
   let expectedSuggestion = Just (Tuple (Tuple 6 6) Four)
-  assertEqual { expected: expectedSuggestion, actual: tryCrossHatch graph }
+  assertEqual { expected: expectedSuggestion, actual: findCrossHatch graph }
 
 testSolve :: Effect Unit
 testSolve = do

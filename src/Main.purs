@@ -14,7 +14,7 @@ import Node.ReadLine as ReadLine
 import Sudoku.VertexColor as Color
 import Sudoku.Worksheet as Worksheet
 import Sudoku.Worksheet (Worksheet(..), AnnotatedWorksheet(..), from2dArray, setVertexColor, setVertexColorWithAnnotations, showWorksheet, showAnnotatedWorksheet, addAnnotations)
-import Sudoku.Solve (tryCrossHatch, tryNakedSingle)
+import Sudoku.Solve (findCrossHatch, findNakedSingle)
 
 printWorksheet :: Worksheet -> Effect Unit
 printWorksheet = log <<< showWorksheet
@@ -24,7 +24,7 @@ printAnnotatedWorksheet = log <<< showAnnotatedWorksheet
 
 suggestAndPromptWithAnnotations :: ReadLine.Interface -> AnnotatedWorksheet -> Effect Unit
 suggestAndPromptWithAnnotations interface worksheet@(AnnotatedWorksheet ws) = do
-  let result = tryCrossHatch ws.coloring
+  let result = findCrossHatch ws.coloring
   case result of
     Just suggestion@(Tuple coord@(Tuple i j) color) -> do
       log $ "Suggestion: Fill cell (" <> show i <> "," <> show j <> ")" <> " with value " <> show (Color.toInt color)
@@ -41,7 +41,7 @@ suggestAndPromptWithAnnotations interface worksheet@(AnnotatedWorksheet ws) = do
                               else Process.exit 0
         ReadLine.question "Continue [yN]? " handleLine interface
     Nothing -> do
-      let nakedSingle = tryNakedSingle worksheet
+      let nakedSingle = findNakedSingle worksheet
       case nakedSingle of
         Just suggestion@(Tuple coord@(Tuple i j) color) -> do
           log $ "Suggestion (Naked Single): Fill cell (" <> show i <> "," <> show j <> ")" <> " with value " <> show (Color.toInt color)
@@ -63,7 +63,7 @@ suggestAndPromptWithAnnotations interface worksheet@(AnnotatedWorksheet ws) = do
 
 suggestAndPrompt :: ReadLine.Interface -> Worksheet -> Effect Unit
 suggestAndPrompt interface worksheet@(Worksheet coloring) = do
-  let result = tryCrossHatch coloring
+  let result = findCrossHatch coloring
   case result of
     Just suggestion@(Tuple coord@(Tuple i j) color) -> do
       log $ "Suggestion: Fill cell (" <> show i <> "," <> show j <> ")" <> " with value " <> show (Color.toInt color)

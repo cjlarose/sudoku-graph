@@ -1,6 +1,6 @@
 module Sudoku.Solve
-  ( tryCrossHatch
-  , tryNakedSingle
+  ( findCrossHatch
+  , findNakedSingle
   ) where
 
 import Prelude
@@ -35,8 +35,8 @@ import Sudoku.Worksheet (AnnotatedWorksheet(..))
 --   for each color
 --     compute the subset of uncolored vertices that have the color as a candidate
 --     if the size of that subset is 1, color that vertex
-tryCrossHatch :: PartialColoring -> Maybe (Tuple Coord VertexColor)
-tryCrossHatch coloring = findMap findColoringInClique <<< Array.fromFoldable $ cliques
+findCrossHatch :: PartialColoring -> Maybe (Tuple Coord VertexColor)
+findCrossHatch coloring = findMap findColoringInClique <<< Array.fromFoldable $ cliques
   where
     uncoloredVertexCandidates :: CandidateAnnotations
     uncoloredVertexCandidates = fromPartialColoring coloring
@@ -59,8 +59,8 @@ tryCrossHatch coloring = findMap findColoringInClique <<< Array.fromFoldable $ c
 -- A naked single is any candidate set of cardinality 1
 -- Since only one candidate can go in that position, we fill that position with
 -- the sole candidate
-tryNakedSingle :: AnnotatedWorksheet -> Maybe (Tuple Coord VertexColor)
-tryNakedSingle (AnnotatedWorksheet ws) = do
+findNakedSingle :: AnnotatedWorksheet -> Maybe (Tuple Coord VertexColor)
+findNakedSingle (AnnotatedWorksheet ws) = do
    Tuple coord colors <- CA.find ((==) 1 <<< Set.size) ws.annotations
    color <- Set.findMin colors
    pure $ Tuple coord color
