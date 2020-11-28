@@ -10,8 +10,10 @@ import Data.Maybe (Maybe(..))
 import Data.Tuple (Tuple(..))
 
 import Sudoku.PartialColoring (from2dArray)
-import Sudoku.Solve (findCrossHatch)
+import Sudoku.Solve (findCrossHatch, findNakedSingle)
 import Sudoku.VertexColor (VertexColor(..))
+import Sudoku.Worksheet (addAnnotations)
+import Sudoku.Worksheet as WS
 
 testCrossHatchReturnsNothingWhenNoneAvailable :: Effect Unit
 testCrossHatchReturnsNothingWhenNoneAvailable = do
@@ -69,9 +71,24 @@ testCrossHatchReturnsSuggestionForRow = do
   let expectedSuggestion = Just (Tuple (Tuple 6 6) Four)
   assertEqual { expected: expectedSuggestion, actual: findCrossHatch graph }
 
+testNakedSingle :: Effect Unit
+testNakedSingle = do
+  let worksheet = addAnnotations <<< WS.from2dArray $ [[0, 4, 0, 0, 0, 0, 0, 0, 0]
+                                                      ,[0, 2, 0, 0, 0, 0, 0, 0, 0]
+                                                      ,[0, 5, 0, 0, 0, 0, 0, 0, 0]
+                                                      ,[0, 0, 0, 0, 0, 0, 0, 0, 0]
+                                                      ,[0, 6, 0, 0, 0, 0, 0, 0, 0]
+                                                      ,[0, 0, 0, 0, 0, 0, 0, 0, 0]
+                                                      ,[0, 0, 0, 0, 0, 0, 0, 0, 0]
+                                                      ,[0, 1, 0, 0, 0, 0, 0, 0, 0]
+                                                      ,[0, 0, 0, 0, 7, 0, 8, 3, 0]]
+  let expectedSuggestion = Just (Tuple (Tuple 8 1) Nine)
+  assertEqual { expected: expectedSuggestion, actual: findNakedSingle worksheet }
+
 testSolve :: Effect Unit
 testSolve = do
   testCrossHatchReturnsNothingWhenNoneAvailable
   testCrossHatchReturnsSuggestionForBlock
   testCrossHatchReturnsSuggestionForColumn
   testCrossHatchReturnsSuggestionForRow
+  testNakedSingle
