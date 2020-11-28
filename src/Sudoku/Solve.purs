@@ -14,7 +14,7 @@ import Data.Array (findMap)
 
 import Sudoku.VertexColor (VertexColor, allColors)
 import Sudoku.PartialColoring (PartialColoring, Coord, cliques, uncoloredVerticies)
-import Sudoku.CandidateAnnotations (CandidateAnnotations, candidatesForCoord)
+import Sudoku.CandidateAnnotations (candidatesForCoord)
 import Sudoku.CandidateAnnotations as CA
 import Sudoku.Worksheet (Worksheet(..), AnnotatedWorksheet(..), addAnnotations)
 
@@ -53,16 +53,13 @@ findNakedSingle (AnnotatedWorksheet ws) = do
 findHiddenSingle :: AnnotatedWorksheet -> Maybe (Tuple Coord VertexColor)
 findHiddenSingle (AnnotatedWorksheet ws) = findMap findColoringInClique <<< Array.fromFoldable $ cliques
   where
-    uncoloredVertexCandidates :: CandidateAnnotations
-    uncoloredVertexCandidates = ws.annotations
-
     findColoringInClique :: Set.Set Coord -> Maybe (Tuple Coord VertexColor)
     findColoringInClique clique = findMap findSuggestion allColors
       where
         uncoloredInClique = Set.intersection clique $ uncoloredVerticies ws.coloring
 
         hasColorAsCandidate :: VertexColor -> Coord -> Boolean
-        hasColorAsCandidate color coord = case candidatesForCoord coord uncoloredVertexCandidates of
+        hasColorAsCandidate color coord = case candidatesForCoord coord ws.annotations of
                                             Just colors -> Set.member color colors
                                             Nothing -> false
 
