@@ -86,7 +86,7 @@ suggestAndPrompt interface worksheet@(Worksheet coloring) = do
   let result = findCrossHatch coloring
   case result of
     Just suggestion@(Tuple coord@(Tuple i j) color) -> do
-      log $ "Suggestion (Cross Hatching): Fill cell (" <> show i <> "," <> show j <> ")" <> " with value " <> show (Color.toInt color)
+      log $ "Suggestion (Cross-Hatching): Fill cell (" <> show i <> "," <> show j <> ")" <> " with value " <> show (Color.toInt color)
       let newWorksheet = setVertexColor coord color worksheet
       printWorksheet newWorksheet
       if Worksheet.complete newWorksheet
