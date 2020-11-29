@@ -3,7 +3,7 @@ module Sudoku.CandidateAnnotations
   , fromPartialColoring
   , candidatesForCoord
   , showCandidates
-  , removeCandidates
+  , removeAllCandidatesForCoord
   , removeCandidateFromCoords
   , find
   ) where
@@ -40,10 +40,8 @@ showCandidates (CandidateAnnotations annotations) = joinWith "\n" <<< map showAn
     showAnnotation :: Tuple Coord (Set.Set VertexColor) -> String
     showAnnotation (Tuple (Tuple i j) candidates) = "candidates(" <> show i <> ", " <> show j <> ") = { " <> showColors candidates <> " } "
 
-removeCandidates :: Coord -> VertexColor -> CandidateAnnotations -> CandidateAnnotations
-removeCandidates coord color annotations =
-  let (CandidateAnnotations newAnnotations) = removeCandidateFromCoords (adjacentVertices coord) color $ annotations
-  in CandidateAnnotations <<< Map.delete coord $ newAnnotations
+removeAllCandidatesForCoord :: Coord -> CandidateAnnotations -> CandidateAnnotations
+removeAllCandidatesForCoord coord (CandidateAnnotations annotations) = CandidateAnnotations <<< Map.delete coord $ annotations
 
 removeCandidateFromCoords :: forall f. Foldable f => f Coord -> VertexColor -> CandidateAnnotations -> CandidateAnnotations
 removeCandidateFromCoords coords color (CandidateAnnotations annotations) = CandidateAnnotations $ foldl remove annotations coords

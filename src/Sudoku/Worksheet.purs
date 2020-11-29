@@ -17,7 +17,7 @@ import Prelude
 
 import Sudoku.VertexColor (VertexColor)
 import Sudoku.Grid (fromPartialColoring, showGrid)
-import Sudoku.PartialColoring (PartialColoring, Coord)
+import Sudoku.PartialColoring (PartialColoring, Coord, adjacentVertices)
 import Sudoku.PartialColoring as PC
 import Sudoku.CandidateAnnotations (CandidateAnnotations)
 import Sudoku.CandidateAnnotations as CA
@@ -36,7 +36,7 @@ setVertexColorWithAnnotations :: Coord -> VertexColor -> AnnotatedWorksheet -> A
 setVertexColorWithAnnotations coord color (AnnotatedWorksheet ws) = AnnotatedWorksheet { coloring: newColoring, annotations: newAnnotations }
   where
     newColoring = PC.setVertexColor coord color ws.coloring
-    newAnnotations = CA.removeCandidates coord color ws.annotations
+    newAnnotations = CA.removeAllCandidatesForCoord coord <<< CA.removeCandidateFromCoords (adjacentVertices coord) color $ ws.annotations
 
 removeCandidateFromCoords :: Array Coord -> VertexColor -> AnnotatedWorksheet -> AnnotatedWorksheet
 removeCandidateFromCoords coords color (AnnotatedWorksheet ws) = AnnotatedWorksheet $ ws { annotations = newAnnotations }
