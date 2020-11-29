@@ -36,8 +36,8 @@ import Sudoku.Worksheet (Worksheet(..), AnnotatedWorksheet(..), addAnnotations)
 --   for each color
 --     compute the subset of uncolored vertices that have the color as a candidate
 --     if the size of that subset is 1, color that vertex
-findCrossHatch :: PartialColoring -> Maybe (Tuple Coord VertexColor)
-findCrossHatch = findHiddenSingle <<< addAnnotations <<< Worksheet
+findCrossHatch :: Worksheet -> Maybe (Tuple Coord VertexColor)
+findCrossHatch = findHiddenSingle <<< addAnnotations
 
 -- A naked single is any candidate set of cardinality 1
 -- Since only one candidate can go in that position, we fill that position with

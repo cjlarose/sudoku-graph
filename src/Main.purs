@@ -37,7 +37,7 @@ findJust (Cons f fs) x = case f x of
 
 annotatedWorksheetStrategies :: List (AnnotatedWorksheet -> Maybe Suggestion)
 annotatedWorksheetStrategies = map toSuggestion <$> List.fromFoldable $
-  [ Tuple "Cross-Hatching" $ findCrossHatch <<< (\(AnnotatedWorksheet ws) -> ws.coloring)
+  [ Tuple "Cross-Hatching" $ findCrossHatch <<< (\(AnnotatedWorksheet ws) -> Worksheet ws.coloring)
   , Tuple "Naked Single" findNakedSingle
   , Tuple "Hidden Single" findHiddenSingle
   ]
@@ -82,8 +82,8 @@ suggestAndPromptWithAnnotations interface worksheet = do
       Process.exit 0
 
 suggestAndPrompt :: ReadLine.Interface -> Worksheet -> Effect Unit
-suggestAndPrompt interface worksheet@(Worksheet coloring) = do
-  let result = findCrossHatch coloring
+suggestAndPrompt interface worksheet = do
+  let result = findCrossHatch worksheet
   case result of
     Just suggestion@(Tuple coord@(Tuple i j) color) -> do
       log $ "Suggestion (Cross-Hatching): Fill cell (" <> show i <> "," <> show j <> ")" <> " with value " <> show (Color.toInt color)
