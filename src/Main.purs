@@ -20,6 +20,9 @@ import Sudoku.Solve (findCrossHatch, findNakedSingle, findHiddenSingle)
 import Sudoku.PartialColoring (Coord)
 import Sudoku.VertexColor (VertexColor)
 
+newtype SuggestedAction = FillCell { coord :: Coord, color :: VertexColor }
+type Suggestion = { strategyName :: String , action :: SuggestedAction }
+
 printWorksheet :: Worksheet -> Effect Unit
 printWorksheet = log <<< showWorksheet
 
@@ -32,22 +35,27 @@ findJust (Cons f fs) x = case f x of
                            Just y -> Just y
                            Nothing -> findJust fs x
 
-annotatedWorksheetStrategies :: List (AnnotatedWorksheet -> Maybe (Tuple Coord VertexColor))
-annotatedWorksheetStrategies = List.fromFoldable
-  [ findCrossHatch <<< (\(AnnotatedWorksheet ws) -> ws.coloring)
-  , findNakedSingle
-  , findHiddenSingle
+annotatedWorksheetStrategies :: List (AnnotatedWorksheet -> Maybe Suggestion)
+annotatedWorksheetStrategies = map toSuggestion <$> List.fromFoldable $
+  [ Tuple "Cross-Hatching" $ findCrossHatch <<< (\(AnnotatedWorksheet ws) -> ws.coloring)
+  , Tuple "Naked Single" findNakedSingle
+  , Tuple "Hidden Single" findHiddenSingle
   ]
+  where
+    toSuggestion :: Tuple String (AnnotatedWorksheet -> Maybe (Tuple Coord VertexColor)) -> (AnnotatedWorksheet -> Maybe Suggestion)
+    toSuggestion (Tuple name f) = (\x -> do
+      (Tuple coord color) <- f x
+      pure { strategyName: name, action: FillCell { coord: coord, color: color } })
 
-getSuggestion :: AnnotatedWorksheet -> Maybe (Tuple Coord VertexColor)
+getSuggestion :: AnnotatedWorksheet -> Maybe Suggestion
 getSuggestion = findJust annotatedWorksheetStrategies
 
 suggestAndPromptWithAnnotations :: ReadLine.Interface -> AnnotatedWorksheet -> Effect Unit
 suggestAndPromptWithAnnotations interface worksheet = do
   let result = getSuggestion worksheet
   case result of
-    Just suggestion@(Tuple coord@(Tuple i j) color) -> do
-      log $ "Suggestion: Fill cell (" <> show i <> "," <> show j <> ")" <> " with value " <> show (Color.toInt color)
+    Just suggestion@({ strategyName: name, action: FillCell { coord: coord@(Tuple i j), color: color } }) -> do
+      log $ "Suggestion (" <> name <> "): Fill cell (" <> show i <> "," <> show j <> ")" <> " with value " <> show (Color.toInt color)
       let newWorksheet = setVertexColorWithAnnotations coord color worksheet
       printAnnotatedWorksheet newWorksheet
       if Worksheet.completeWithAnnotations newWorksheet
