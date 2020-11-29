@@ -55,12 +55,16 @@ applySuggestion { action: action } =
   case action of
     FillCell { coord: coord, color: color} -> setVertexColorWithAnnotations coord color
 
+showSuggestion :: Suggestion -> String
+showSuggestion { strategyName: name, action: FillCell { coord: (Tuple i j), color: color } } =
+  "Suggestion (" <> name <> "): Fill cell (" <> show i <> "," <> show j <> ")" <> " with value " <> show (Color.toInt color)
+
 suggestAndPromptWithAnnotations :: ReadLine.Interface -> AnnotatedWorksheet -> Effect Unit
 suggestAndPromptWithAnnotations interface worksheet = do
   let result = getSuggestion worksheet
   case result of
-    Just suggestion@({ strategyName: name, action: FillCell { coord: coord@(Tuple i j), color: color } }) -> do
-      log $ "Suggestion (" <> name <> "): Fill cell (" <> show i <> "," <> show j <> ")" <> " with value " <> show (Color.toInt color)
+    Just suggestion -> do
+      log <<< showSuggestion $ suggestion
       let newWorksheet = applySuggestion suggestion worksheet
       printAnnotatedWorksheet newWorksheet
       if Worksheet.completeWithAnnotations newWorksheet
