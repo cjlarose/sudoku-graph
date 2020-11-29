@@ -47,9 +47,8 @@ annotatedWorksheetStrategies = List.fromFoldable $
   ]
   where
     toSuggestion :: String -> (AnnotatedWorksheet -> Maybe SuggestedAction) -> AnnotatedWorksheet -> Maybe Suggestion
-    toSuggestion name f x = do
-      action <- f x
-      pure { strategyName: name, action: action }
+    toSuggestion name f x =
+      (\action -> { strategyName: name, action: action }) <$> f x
 
 getSuggestionForAnnotatedWorksheet :: AnnotatedWorksheet -> Maybe Suggestion
 getSuggestionForAnnotatedWorksheet = findJust annotatedWorksheetStrategies
