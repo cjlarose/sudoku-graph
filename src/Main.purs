@@ -19,9 +19,7 @@ import Sudoku.Worksheet (Worksheet, AnnotatedWorksheet, from2dArray, setVertexCo
 import Sudoku.Solve (findCrossHatch, findNakedSingle, findHiddenSingle)
 import Sudoku.PartialColoring (Coord)
 import Sudoku.VertexColor (VertexColor)
-
-newtype SuggestedAction = FillCell { coord :: Coord, color :: VertexColor }
-type Suggestion = { strategyName :: String , action :: SuggestedAction }
+import Sudoku.Suggestion (Suggestion, SuggestedAction(..), showSuggestion)
 
 printWorksheet :: Worksheet -> Effect Unit
 printWorksheet = log <<< showWorksheet
@@ -54,10 +52,6 @@ applySuggestion :: Suggestion -> AnnotatedWorksheet -> AnnotatedWorksheet
 applySuggestion { action: action } =
   case action of
     FillCell { coord: coord, color: color} -> setVertexColorWithAnnotations coord color
-
-showSuggestion :: Suggestion -> String
-showSuggestion { strategyName: name, action: FillCell { coord: (Tuple i j), color: color } } =
-  "Suggestion (" <> name <> "): Fill cell (" <> show i <> "," <> show j <> ")" <> " with value " <> show (Color.toInt color)
 
 suggestAndPromptWithAnnotations :: ReadLine.Interface -> AnnotatedWorksheet -> Effect Unit
 suggestAndPromptWithAnnotations interface worksheet = do
