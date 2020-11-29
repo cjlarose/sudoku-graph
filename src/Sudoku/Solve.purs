@@ -16,7 +16,7 @@ import Data.List.Lazy as LazyList
 import Control.MonadZero (guard)
 
 import Sudoku.VertexColor (VertexColor, allColors)
-import Sudoku.PartialColoring (Coord, cliques, uncoloredVerticies)
+import Sudoku.PartialColoring (Coord, cliques)
 import Sudoku.CandidateAnnotations (CandidateAnnotations, candidatesForCoord)
 import Sudoku.CandidateAnnotations as CA
 import Sudoku.Worksheet (Worksheet, AnnotatedWorksheet(..), addAnnotations)
@@ -43,18 +43,11 @@ findNakedSingle (AnnotatedWorksheet ws) = do
 findHiddenSingle :: AnnotatedWorksheet -> Maybe SuggestedAction
 findHiddenSingle (AnnotatedWorksheet ws) = findMap findColoringInClique <<< Array.fromFoldable $ cliques
   where
-    hasColorAsCandidate :: VertexColor -> Coord -> Boolean
-    hasColorAsCandidate color coord = case candidatesForCoord coord ws.annotations of
-                                        Just colors -> Set.member color colors
-                                        Nothing -> false
-
     findColoringInClique :: Set.Set Coord -> Maybe SuggestedAction
     findColoringInClique clique = findMap findSuggestion allColors
       where
-        uncoloredInClique = Set.intersection clique $ uncoloredVerticies ws.coloring
-
         findSuggestion :: VertexColor -> Maybe SuggestedAction
-        findSuggestion color = case Array.fromFoldable <<< Set.filter (hasColorAsCandidate color) $ uncoloredInClique of
+        findSuggestion color = case Array.fromFoldable <<< vertexSubsetWithCandidate color ws.annotations $ clique of
                                  [coord] -> Just $ FillCell { coord: coord, color: color }
                                  _ -> Nothing
 
