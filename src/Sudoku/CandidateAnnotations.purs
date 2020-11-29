@@ -41,16 +41,9 @@ showCandidates (CandidateAnnotations annotations) = joinWith "\n" <<< map showAn
     showAnnotation (Tuple (Tuple i j) candidates) = "candidates(" <> show i <> ", " <> show j <> ") = { " <> showColors candidates <> " } "
 
 removeCandidates :: Coord -> VertexColor -> CandidateAnnotations -> CandidateAnnotations
-removeCandidates coord color (CandidateAnnotations annotations) = CandidateAnnotations newAnnotations
-  where
-    neighbors :: Set.Set Coord
-    neighbors = adjacentVertices coord
-
-    updates :: Map.Map Coord (Set.Set VertexColor)
-    updates = Map.mapMaybe (Just <<< Set.delete color) <<< Map.filterKeys (\v -> v `Set.member` neighbors) $ annotations
-
-    newAnnotations :: Map.Map Coord (Set.Set VertexColor)
-    newAnnotations = Map.delete coord <<< Map.union updates $ annotations
+removeCandidates coord color annotations =
+  let (CandidateAnnotations newAnnotations) = removeCandidateFromCoords (adjacentVertices coord) color $ annotations
+  in CandidateAnnotations <<< Map.delete coord $ newAnnotations
 
 removeCandidateFromCoords :: forall f. Foldable f => f Coord -> VertexColor -> CandidateAnnotations -> CandidateAnnotations
 removeCandidateFromCoords coords color (CandidateAnnotations annotations) = CandidateAnnotations $ foldl remove annotations coords
