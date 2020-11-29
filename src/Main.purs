@@ -24,6 +24,11 @@ printWorksheet = log <<< showWorksheet
 printAnnotatedWorksheet :: AnnotatedWorksheet -> Effect Unit
 printAnnotatedWorksheet = log <<< showAnnotatedWorksheet
 
+getSuggestion :: Worksheet -> Maybe Suggestion
+getSuggestion worksheet = do
+  action <- findCrossHatch worksheet
+  pure $ { strategyName: "Cross-Hatching", action: action }
+
 findJust :: forall a b. List (a -> Maybe b) -> a -> Maybe b
 findJust Nil _ = Nothing
 findJust (Cons f fs) x = case f x of
@@ -74,10 +79,9 @@ suggestAndPromptWithAnnotations interface worksheet = do
 
 suggestAndPrompt :: ReadLine.Interface -> Worksheet -> Effect Unit
 suggestAndPrompt interface worksheet = do
-  let result = findCrossHatch worksheet
+  let result = getSuggestion worksheet
   case result of
-    Just action@(FillCell { coord: coord, color: color } ) -> do
-      let suggestion = { strategyName: "Cross-Hatching", action: action }
+    Just suggestion@{ action: FillCell { coord: coord, color: color } } -> do
       log <<< showSuggestion $ suggestion
       let newWorksheet = setVertexColor coord color worksheet
       printWorksheet newWorksheet
