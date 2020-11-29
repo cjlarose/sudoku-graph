@@ -19,24 +19,10 @@ import Sudoku.CandidateAnnotations as CA
 import Sudoku.Worksheet (Worksheet, AnnotatedWorksheet(..), addAnnotations)
 import Sudoku.Suggestion (SuggestedAction(..))
 
--- Typically, crosshatching is identifying, within a block, a unique cell where
--- a given candidate can be assigned cells within a block are eliminated if
--- they belong to a row or column that already has that candidate
---
--- In the graph, we can examine the nine vertices that correspond to a block.
--- Eliminate all vertices that are adjacent to a vertex colored with the given
--- color. If there's only one vertex remaining, we can assign the color to that
--- vertex This is because in each k_9 subgraph, exactly one vertex must have
--- each color
---
--- More generally, identify any 9-clique in the graph and apply the same
--- logic.
--- candidates = for each uncolored vertex, compute candidate colors by
---              eliminating colors of adjacent vertices for each clique
---   uncolored = uncolored vertex subset
---   for each color
---     compute the subset of uncolored vertices that have the color as a candidate
---     if the size of that subset is 1, color that vertex
+-- Cross-Hatching is identifying any uncolored vertex within a 9-clique that
+-- can uniquely be assigned a particular color. It is equivalent to the "Hidden
+-- Single" strategy, but using only the trivial annotations (annotations that
+-- do no violate the rules of the game).
 findCrossHatch :: Worksheet -> Maybe SuggestedAction
 findCrossHatch = findHiddenSingle <<< addAnnotations
 
