@@ -10,8 +10,6 @@ import Prelude
 import Data.Maybe (Maybe(..))
 import Data.Tuple (Tuple(..))
 import Data.Set as Set
-import Data.Array as Array
-import Data.Array (findMap)
 import Data.List.Lazy as LazyList
 import Control.MonadZero (guard)
 
@@ -41,15 +39,13 @@ findNakedSingle (AnnotatedWorksheet ws) = do
 -- If a candidate color appears only once within any house (9-clique), that
 -- cell must be colored with that candidate color
 findHiddenSingle :: AnnotatedWorksheet -> Maybe SuggestedAction
-findHiddenSingle (AnnotatedWorksheet ws) = findMap findColoringInClique <<< Array.fromFoldable $ cliques
-  where
-    findColoringInClique :: Set.Set Coord -> Maybe SuggestedAction
-    findColoringInClique clique = findMap findSuggestion allColors
-      where
-        findSuggestion :: VertexColor -> Maybe SuggestedAction
-        findSuggestion color = case Array.fromFoldable <<< vertexSubsetWithCandidate color ws.annotations $ clique of
-                                 [coord] -> Just $ FillCell { coord: coord, color: color }
-                                 _ -> Nothing
+findHiddenSingle (AnnotatedWorksheet ws) = LazyList.head do
+  clique <- LazyList.fromFoldable cliques
+  color <- LazyList.fromFoldable allColors
+  let verticies = vertexSubsetWithCandidate color ws.annotations clique
+  guard $ Set.size verticies == 1
+  coord <- LazyList.fromFoldable <<< Set.findMin $ verticies
+  pure $ FillCell { coord: coord, color: color }
 
 vertexSubsetWithCandidate :: VertexColor -> CandidateAnnotations -> Set.Set Coord -> Set.Set Coord
 vertexSubsetWithCandidate color annotations xs = Set.filter hasColorAsCandidate xs
