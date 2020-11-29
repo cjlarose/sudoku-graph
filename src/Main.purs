@@ -6,7 +6,6 @@ import Effect (Effect)
 import Effect.Console (log)
 import Data.Options ((:=))
 import Data.Maybe (Maybe(..))
-import Data.Tuple (Tuple(..))
 import Data.List (List(..))
 import Data.List as List
 
@@ -41,14 +40,14 @@ findJust (Cons f fs) x = case f x of
                            Nothing -> findJust fs x
 
 annotatedWorksheetStrategies :: List (AnnotatedWorksheet -> Maybe Suggestion)
-annotatedWorksheetStrategies = map toSuggestion <$> List.fromFoldable $
-  [ Tuple "Cross-Hatching" $ findCrossHatch <<< stripAnnotations
-  , Tuple "Naked Single" findNakedSingle
-  , Tuple "Hidden Single" findHiddenSingle
+annotatedWorksheetStrategies = List.fromFoldable $
+  [ toSuggestion "Cross-Hatching" $ findCrossHatch <<< stripAnnotations
+  , toSuggestion "Naked Single" findNakedSingle
+  , toSuggestion "Hidden Single" findHiddenSingle
   ]
   where
-    toSuggestion :: Tuple String (AnnotatedWorksheet -> Maybe SuggestedAction) -> (AnnotatedWorksheet -> Maybe Suggestion)
-    toSuggestion (Tuple name f) = (\x -> do
+    toSuggestion :: String -> (AnnotatedWorksheet -> Maybe SuggestedAction) -> (AnnotatedWorksheet -> Maybe Suggestion)
+    toSuggestion name f = (\x -> do
       action <- f x
       pure { strategyName: name, action: action })
 
