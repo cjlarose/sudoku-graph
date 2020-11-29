@@ -32,9 +32,9 @@ findCrossHatch = findHiddenSingle <<< addAnnotations
 -- the sole candidate
 findNakedSingle :: AnnotatedWorksheet -> Maybe SuggestedAction
 findNakedSingle (AnnotatedWorksheet ws) = do
-   Tuple coord colors <- CA.find ((==) 1 <<< Set.size) ws.annotations
-   color <- Set.findMin colors
-   pure $ FillCell { coord: coord, color: color }
+  Tuple coord colors <- CA.find ((==) 1 <<< Set.size) ws.annotations
+  color <- Set.findMin colors
+  pure $ FillCell { coord: coord, color: color }
 
 -- If a candidate color appears only once within any house (9-clique), that
 -- cell must be colored with that candidate color
