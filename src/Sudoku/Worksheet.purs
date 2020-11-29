@@ -4,6 +4,7 @@ module Sudoku.Worksheet
   , from2dArray
   , setVertexColor
   , setVertexColorWithAnnotations
+  , removeCandidateFromCoords
   , showWorksheet
   , showAnnotatedWorksheet
   , addAnnotations
@@ -36,6 +37,11 @@ setVertexColorWithAnnotations coord color (AnnotatedWorksheet ws) = AnnotatedWor
   where
     newColoring = PC.setVertexColor coord color ws.coloring
     newAnnotations = CA.removeCandidates coord color ws.annotations
+
+removeCandidateFromCoords :: Array Coord -> VertexColor -> AnnotatedWorksheet -> AnnotatedWorksheet
+removeCandidateFromCoords coords color (AnnotatedWorksheet ws) = AnnotatedWorksheet $ ws { annotations = newAnnotations }
+  where
+    newAnnotations = CA.removeCandidateFromCoords coords color ws.annotations
 
 showWorksheet :: Worksheet -> String
 showWorksheet (Worksheet coloring) = showGrid <<< fromPartialColoring $ coloring

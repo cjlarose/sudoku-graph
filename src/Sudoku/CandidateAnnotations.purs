@@ -4,6 +4,7 @@ module Sudoku.CandidateAnnotations
   , candidatesForCoord
   , showCandidates
   , removeCandidates
+  , removeCandidateFromCoords
   , find
   ) where
 
@@ -14,6 +15,7 @@ import Data.Set as Set
 import Data.Tuple (Tuple(..))
 import Data.Maybe (Maybe(..))
 import Data.String (joinWith)
+import Data.Foldable (class Foldable, foldl)
 
 import Sudoku.PartialColoring (PartialColoring, Coord, adjacentVertices, uncoloredVerticies, getVertexColor)
 import Sudoku.VertexColor (VertexColor, allColors, toInt)
@@ -49,6 +51,11 @@ removeCandidates coord color (CandidateAnnotations annotations) = CandidateAnnot
 
     newAnnotations :: Map.Map Coord (Set.Set VertexColor)
     newAnnotations = Map.delete coord <<< Map.union updates $ annotations
+
+removeCandidateFromCoords :: forall f. Foldable f => f Coord -> VertexColor -> CandidateAnnotations -> CandidateAnnotations
+removeCandidateFromCoords coords color (CandidateAnnotations annotations) = CandidateAnnotations $ foldl remove annotations coords
+  where
+    remove acc coord = Map.update (\candidates -> Just <<< Set.difference candidates <<< Set.singleton $ color) coord acc
 
 find :: (Set.Set VertexColor -> Boolean) -> CandidateAnnotations -> Maybe (Tuple Coord (Set.Set VertexColor))
 find f (CandidateAnnotations annotations) = do

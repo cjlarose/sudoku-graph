@@ -4,6 +4,7 @@ import Prelude
 
 import Effect (Effect)
 import Effect.Console (log)
+import Effect.Exception.Unsafe (unsafeThrow)
 import Data.Options ((:=))
 import Data.Maybe (Maybe(..))
 import Data.List (List(..))
@@ -13,7 +14,7 @@ import Node.Process as Process
 import Node.ReadLine as ReadLine
 
 import Sudoku.Worksheet as Worksheet
-import Sudoku.Worksheet (Worksheet, AnnotatedWorksheet, from2dArray, setVertexColor, setVertexColorWithAnnotations, showWorksheet, showAnnotatedWorksheet, addAnnotations, stripAnnotations)
+import Sudoku.Worksheet (Worksheet, AnnotatedWorksheet, from2dArray, setVertexColor, setVertexColorWithAnnotations, removeCandidateFromCoords, showWorksheet, showAnnotatedWorksheet, addAnnotations, stripAnnotations)
 import Sudoku.Solve (findCrossHatch, findNakedSingle, findHiddenSingle)
 import Sudoku.Suggestion (Suggestion, SuggestedAction(..), showSuggestion)
 
@@ -32,6 +33,7 @@ applySuggestion :: Suggestion -> Worksheet -> Worksheet
 applySuggestion { action: action } =
   case action of
     FillCell { coord: coord, color: color } -> setVertexColor coord color
+    _ -> unsafeThrow "Impossible"
 
 findJust :: forall a b. List (a -> Maybe b) -> a -> Maybe b
 findJust Nil _ = Nothing
@@ -57,6 +59,7 @@ applySuggestionToAnnotatedWorksheet :: Suggestion -> AnnotatedWorksheet -> Annot
 applySuggestionToAnnotatedWorksheet { action: action } =
   case action of
     FillCell { coord: coord, color: color} -> setVertexColorWithAnnotations coord color
+    RemoveCandidates { coords: coords, color: color } -> removeCandidateFromCoords coords color
 
 suggestAndPromptWithAnnotations :: ReadLine.Interface -> AnnotatedWorksheet -> Effect Unit
 suggestAndPromptWithAnnotations interface worksheet = do
