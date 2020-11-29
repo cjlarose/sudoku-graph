@@ -13,10 +13,10 @@ import Data.Array as Array
 import Data.Array (findMap)
 
 import Sudoku.VertexColor (VertexColor, allColors)
-import Sudoku.PartialColoring (PartialColoring, Coord, cliques, uncoloredVerticies)
+import Sudoku.PartialColoring (Coord, cliques, uncoloredVerticies)
 import Sudoku.CandidateAnnotations (candidatesForCoord)
 import Sudoku.CandidateAnnotations as CA
-import Sudoku.Worksheet (Worksheet(..), AnnotatedWorksheet(..), addAnnotations)
+import Sudoku.Worksheet (Worksheet, AnnotatedWorksheet(..), addAnnotations)
 
 -- Typically, crosshatching is identifying, within a block, a unique cell where
 -- a given candidate can be assigned cells within a block are eliminated if
