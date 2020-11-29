@@ -50,13 +50,18 @@ annotatedWorksheetStrategies = map toSuggestion <$> List.fromFoldable $
 getSuggestion :: AnnotatedWorksheet -> Maybe Suggestion
 getSuggestion = findJust annotatedWorksheetStrategies
 
+applySuggestion :: Suggestion -> AnnotatedWorksheet -> AnnotatedWorksheet
+applySuggestion { action: action } =
+  case action of
+    FillCell { coord: coord, color: color} -> setVertexColorWithAnnotations coord color
+
 suggestAndPromptWithAnnotations :: ReadLine.Interface -> AnnotatedWorksheet -> Effect Unit
 suggestAndPromptWithAnnotations interface worksheet = do
   let result = getSuggestion worksheet
   case result of
     Just suggestion@({ strategyName: name, action: FillCell { coord: coord@(Tuple i j), color: color } }) -> do
       log $ "Suggestion (" <> name <> "): Fill cell (" <> show i <> "," <> show j <> ")" <> " with value " <> show (Color.toInt color)
-      let newWorksheet = setVertexColorWithAnnotations coord color worksheet
+      let newWorksheet = applySuggestion suggestion worksheet
       printAnnotatedWorksheet newWorksheet
       if Worksheet.completeWithAnnotations newWorksheet
       then do
