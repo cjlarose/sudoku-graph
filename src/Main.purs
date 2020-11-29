@@ -50,8 +50,8 @@ annotatedWorksheetStrategies = map toSuggestion <$> List.fromFoldable $
 getSuggestionForAnnotatedWorksheet :: AnnotatedWorksheet -> Maybe Suggestion
 getSuggestionForAnnotatedWorksheet = findJust annotatedWorksheetStrategies
 
-applySuggestion :: Suggestion -> AnnotatedWorksheet -> AnnotatedWorksheet
-applySuggestion { action: action } =
+applySuggestionToAnnotatedWorksheet :: Suggestion -> AnnotatedWorksheet -> AnnotatedWorksheet
+applySuggestionToAnnotatedWorksheet { action: action } =
   case action of
     FillCell { coord: coord, color: color} -> setVertexColorWithAnnotations coord color
 
@@ -61,7 +61,7 @@ suggestAndPromptWithAnnotations interface worksheet = do
   case result of
     Just suggestion -> do
       log <<< showSuggestion $ suggestion
-      let newWorksheet = applySuggestion suggestion worksheet
+      let newWorksheet = applySuggestionToAnnotatedWorksheet suggestion worksheet
       printAnnotatedWorksheet newWorksheet
       if Worksheet.completeWithAnnotations newWorksheet
       then do
