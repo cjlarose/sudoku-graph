@@ -17,6 +17,7 @@ import Sudoku.PartialColoring (Coord, cliques, uncoloredVerticies)
 import Sudoku.CandidateAnnotations (candidatesForCoord)
 import Sudoku.CandidateAnnotations as CA
 import Sudoku.Worksheet (Worksheet, AnnotatedWorksheet(..), addAnnotations)
+import Sudoku.Suggestion (SuggestedAction(..))
 
 -- Typically, crosshatching is identifying, within a block, a unique cell where
 -- a given candidate can be assigned cells within a block are eliminated if
@@ -36,21 +37,21 @@ import Sudoku.Worksheet (Worksheet, AnnotatedWorksheet(..), addAnnotations)
 --   for each color
 --     compute the subset of uncolored vertices that have the color as a candidate
 --     if the size of that subset is 1, color that vertex
-findCrossHatch :: Worksheet -> Maybe (Tuple Coord VertexColor)
+findCrossHatch :: Worksheet -> Maybe SuggestedAction
 findCrossHatch = findHiddenSingle <<< addAnnotations
 
 -- A naked single is any candidate set of cardinality 1
 -- Since only one candidate can go in that position, we fill that position with
 -- the sole candidate
-findNakedSingle :: AnnotatedWorksheet -> Maybe (Tuple Coord VertexColor)
+findNakedSingle :: AnnotatedWorksheet -> Maybe SuggestedAction
 findNakedSingle (AnnotatedWorksheet ws) = do
    Tuple coord colors <- CA.find ((==) 1 <<< Set.size) ws.annotations
    color <- Set.findMin colors
-   pure $ Tuple coord color
+   pure $ FillCell { coord: coord, color: color }
 
 -- If a candidate color appears only once within any house (9-clique), that
 -- cell must be colored with that candidate color
-findHiddenSingle :: AnnotatedWorksheet -> Maybe (Tuple Coord VertexColor)
+findHiddenSingle :: AnnotatedWorksheet -> Maybe SuggestedAction
 findHiddenSingle (AnnotatedWorksheet ws) = findMap findColoringInClique <<< Array.fromFoldable $ cliques
   where
     hasColorAsCandidate :: VertexColor -> Coord -> Boolean
@@ -58,12 +59,12 @@ findHiddenSingle (AnnotatedWorksheet ws) = findMap findColoringInClique <<< Arra
                                         Just colors -> Set.member color colors
                                         Nothing -> false
 
-    findColoringInClique :: Set.Set Coord -> Maybe (Tuple Coord VertexColor)
+    findColoringInClique :: Set.Set Coord -> Maybe SuggestedAction
     findColoringInClique clique = findMap findSuggestion allColors
       where
         uncoloredInClique = Set.intersection clique $ uncoloredVerticies ws.coloring
 
-        findSuggestion :: VertexColor -> Maybe (Tuple Coord VertexColor)
+        findSuggestion :: VertexColor -> Maybe SuggestedAction
         findSuggestion color = case Array.fromFoldable <<< Set.filter (hasColorAsCandidate color) $ uncoloredInClique of
-                                 [coord] -> Just $ Tuple coord color
+                                 [coord] -> Just $ FillCell { coord: coord, color: color }
                                  _ -> Nothing

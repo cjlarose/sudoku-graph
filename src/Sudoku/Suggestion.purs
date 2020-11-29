@@ -14,6 +14,11 @@ import Sudoku.VertexColor (VertexColor)
 newtype SuggestedAction = FillCell { coord :: Coord, color :: VertexColor }
 type Suggestion = { strategyName :: String , action :: SuggestedAction }
 
+derive instance eqSuggestedAction :: Eq SuggestedAction
+
+instance showSuggestedAction :: Show SuggestedAction where
+  show (FillCell r) = "(FillCell " <> show r <> ")"
+
 showSuggestion :: Suggestion -> String
 showSuggestion { strategyName: name, action: FillCell { coord: (Tuple i j), color: color } } =
   "Suggestion (" <> name <> "): Fill cell (" <> show i <> "," <> show j <> ")" <> " with value " <> show (Color.toInt color)

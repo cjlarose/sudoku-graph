@@ -13,6 +13,7 @@ import Sudoku.Solve (findCrossHatch, findNakedSingle, findHiddenSingle)
 import Sudoku.VertexColor (VertexColor(..))
 import Sudoku.Worksheet (addAnnotations)
 import Sudoku.Worksheet as WS
+import Sudoku.Suggestion (SuggestedAction(..))
 
 testCrossHatchReturnsNothingWhenNoneAvailable :: Effect Unit
 testCrossHatchReturnsNothingWhenNoneAvailable = do
@@ -39,7 +40,7 @@ testCrossHatchReturnsSuggestionForBlock = do
                              ,[0, 3, 0, 0, 0, 0, 0, 0, 0]
                              ,[0, 0, 0, 0, 0, 0, 0, 0, 0]
                              ,[0, 0, 0, 3, 0, 0, 0, 0, 0]]
-  let expectedSuggestion = Just (Tuple (Tuple 7 8) Three)
+  let expectedSuggestion = Just $ FillCell { coord: Tuple 7 8, color: Three }
   assertEqual { expected: expectedSuggestion, actual: findCrossHatch graph }
 
 testCrossHatchReturnsSuggestionForColumn :: Effect Unit
@@ -53,7 +54,7 @@ testCrossHatchReturnsSuggestionForColumn = do
                              ,[0, 0, 8, 0, 0, 0, 0, 0, 0]
                              ,[0, 0, 0, 9, 0, 0, 0, 0, 0]
                              ,[0, 0, 0, 5, 0, 0, 0, 0, 0]]
-  let expectedSuggestion = Just (Tuple (Tuple 4 3) Eight)
+  let expectedSuggestion = Just $ FillCell { coord: Tuple 4 3, color: Eight }
   assertEqual { expected: expectedSuggestion, actual: findCrossHatch graph }
 
 testCrossHatchReturnsSuggestionForRow :: Effect Unit
@@ -67,7 +68,7 @@ testCrossHatchReturnsSuggestionForRow = do
                              ,[7, 0, 6, 0, 5, 2, 0, 9, 8]
                              ,[0, 0, 0, 0, 0, 0, 0, 0, 0]
                              ,[0, 0, 0, 0, 0, 0, 0, 0, 0]]
-  let expectedSuggestion = Just (Tuple (Tuple 6 6) Four)
+  let expectedSuggestion = Just $ FillCell { coord: Tuple 6 6, color: Four }
   assertEqual { expected: expectedSuggestion, actual: findCrossHatch graph }
 
 testNakedSingle :: Effect Unit
@@ -81,7 +82,7 @@ testNakedSingle = do
                                                       ,[0, 0, 0, 0, 0, 0, 0, 0, 0]
                                                       ,[0, 1, 0, 0, 0, 0, 0, 0, 0]
                                                       ,[0, 0, 0, 0, 7, 0, 8, 3, 0]]
-  let expectedSuggestion = Just (Tuple (Tuple 8 1) Nine)
+  let expectedSuggestion = Just $ FillCell { coord: Tuple 8 1, color: Nine }
   assertEqual { expected: expectedSuggestion, actual: findNakedSingle worksheet }
 
 testHiddenSingle :: Effect Unit
@@ -95,7 +96,7 @@ testHiddenSingle = do
                                                       ,[7, 0, 6, 0, 5, 2, 0, 9, 8]
                                                       ,[0, 0, 0, 0, 0, 0, 0, 0, 0]
                                                       ,[0, 0, 0, 0, 0, 0, 0, 0, 0]]
-  let expectedSuggestion = Just (Tuple (Tuple 6 6) Four)
+  let expectedSuggestion = Just $ FillCell { coord: Tuple 6 6, color: Four }
   assertEqual { expected: expectedSuggestion, actual: findHiddenSingle worksheet }
 
 testSolve :: Effect Unit

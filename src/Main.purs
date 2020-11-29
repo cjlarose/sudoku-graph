@@ -13,12 +13,9 @@ import Data.List as List
 import Node.Process as Process
 import Node.ReadLine as ReadLine
 
-import Sudoku.VertexColor as Color
 import Sudoku.Worksheet as Worksheet
 import Sudoku.Worksheet (Worksheet, AnnotatedWorksheet, from2dArray, setVertexColor, setVertexColorWithAnnotations, showWorksheet, showAnnotatedWorksheet, addAnnotations, stripAnnotations)
 import Sudoku.Solve (findCrossHatch, findNakedSingle, findHiddenSingle)
-import Sudoku.PartialColoring (Coord)
-import Sudoku.VertexColor (VertexColor)
 import Sudoku.Suggestion (Suggestion, SuggestedAction(..), showSuggestion)
 
 printWorksheet :: Worksheet -> Effect Unit
@@ -40,10 +37,10 @@ annotatedWorksheetStrategies = map toSuggestion <$> List.fromFoldable $
   , Tuple "Hidden Single" findHiddenSingle
   ]
   where
-    toSuggestion :: Tuple String (AnnotatedWorksheet -> Maybe (Tuple Coord VertexColor)) -> (AnnotatedWorksheet -> Maybe Suggestion)
+    toSuggestion :: Tuple String (AnnotatedWorksheet -> Maybe SuggestedAction) -> (AnnotatedWorksheet -> Maybe Suggestion)
     toSuggestion (Tuple name f) = (\x -> do
-      (Tuple coord color) <- f x
-      pure { strategyName: name, action: FillCell { coord: coord, color: color } })
+      action <- f x
+      pure { strategyName: name, action: action })
 
 getSuggestion :: AnnotatedWorksheet -> Maybe Suggestion
 getSuggestion = findJust annotatedWorksheetStrategies
@@ -79,8 +76,9 @@ suggestAndPrompt :: ReadLine.Interface -> Worksheet -> Effect Unit
 suggestAndPrompt interface worksheet = do
   let result = findCrossHatch worksheet
   case result of
-    Just suggestion@(Tuple coord@(Tuple i j) color) -> do
-      log $ "Suggestion (Cross-Hatching): Fill cell (" <> show i <> "," <> show j <> ")" <> " with value " <> show (Color.toInt color)
+    Just action@(FillCell { coord: coord, color: color } ) -> do
+      let suggestion = { strategyName: "Cross-Hatching", action: action }
+      log <<< showSuggestion $ suggestion
       let newWorksheet = setVertexColor coord color worksheet
       printWorksheet newWorksheet
       if Worksheet.complete newWorksheet
