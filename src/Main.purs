@@ -29,6 +29,11 @@ getSuggestion worksheet = do
   action <- findCrossHatch worksheet
   pure $ { strategyName: "Cross-Hatching", action: action }
 
+applySuggestion :: Suggestion -> Worksheet -> Worksheet
+applySuggestion { action: action } =
+  case action of
+    FillCell { coord: coord, color: color } -> setVertexColor coord color
+
 findJust :: forall a b. List (a -> Maybe b) -> a -> Maybe b
 findJust Nil _ = Nothing
 findJust (Cons f fs) x = case f x of
@@ -81,9 +86,9 @@ suggestAndPrompt :: ReadLine.Interface -> Worksheet -> Effect Unit
 suggestAndPrompt interface worksheet = do
   let result = getSuggestion worksheet
   case result of
-    Just suggestion@{ action: FillCell { coord: coord, color: color } } -> do
+    Just suggestion -> do
       log <<< showSuggestion $ suggestion
-      let newWorksheet = setVertexColor coord color worksheet
+      let newWorksheet = applySuggestion suggestion worksheet
       printWorksheet newWorksheet
       if Worksheet.complete newWorksheet
       then do
