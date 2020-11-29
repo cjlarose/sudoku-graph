@@ -9,7 +9,7 @@ import Test.Assert (assertEqual)
 import Data.Maybe (Maybe(..))
 import Data.Tuple (Tuple(..))
 
-import Sudoku.Solve (findCrossHatch, findNakedSingle, findHiddenSingle)
+import Sudoku.Solve (findCrossHatch, findNakedSingle, findHiddenSingle, findClaimingVerticies)
 import Sudoku.VertexColor (VertexColor(..))
 import Sudoku.Worksheet (addAnnotations)
 import Sudoku.Worksheet as WS
@@ -99,6 +99,48 @@ testHiddenSingle = do
   let expectedSuggestion = Just $ FillCell { coord: Tuple 6 6, color: Four }
   assertEqual { expected: expectedSuggestion, actual: findHiddenSingle worksheet }
 
+testClaimingVerticiesInRow :: Effect Unit
+testClaimingVerticiesInRow = do
+  let worksheet = addAnnotations <<< WS.from2dArray $ [[0, 0, 0, 0, 0, 0, 0, 0, 0]
+                                                      ,[0, 8, 0, 0, 0, 0, 0, 0, 0]
+                                                      ,[0, 0, 0, 0, 0, 0, 0, 0, 0]
+                                                      ,[5, 0, 4, 0, 0, 1, 2, 7, 6]
+                                                      ,[0, 0, 0, 0, 0, 0, 0, 0, 0]
+                                                      ,[0, 0, 0, 0, 0, 0, 0, 0, 0]
+                                                      ,[0, 0, 0, 0, 0, 0, 0, 0, 0]
+                                                      ,[0, 0, 0, 0, 0, 0, 0, 0, 0]
+                                                      ,[0, 0, 0, 0, 0, 0, 0, 0, 0]]
+  let expectedSuggestion = Just $ RemoveCandidates { coords: [ Tuple 4 3
+                                                             , Tuple 4 4
+                                                             , Tuple 4 5
+                                                             , Tuple 5 3
+                                                             , Tuple 5 4
+                                                             , Tuple 5 5
+                                                             ]
+                                                   , color: Eight }
+  assertEqual { expected: expectedSuggestion, actual: findClaimingVerticies worksheet }
+
+testClaimingVerticiesInBlock :: Effect Unit
+testClaimingVerticiesInBlock = do
+  let worksheet = addAnnotations <<< WS.from2dArray $ [[0, 0, 0, 0, 0, 0, 0, 0, 0]
+                                                      ,[0, 0, 0, 0, 0, 0, 0, 0, 0]
+                                                      ,[0, 0, 0, 0, 0, 0, 0, 0, 0]
+                                                      ,[0, 0, 0, 0, 0, 0, 1, 4, 6]
+                                                      ,[0, 0, 0, 0, 0, 0, 5, 2, 8]
+                                                      ,[0, 0, 0, 0, 0, 0, 0, 3, 0]
+                                                      ,[0, 0, 0, 0, 0, 0, 0, 0, 0]
+                                                      ,[0, 0, 0, 0, 0, 0, 0, 0, 0]
+                                                      ,[0, 0, 0, 0, 0, 0, 0, 0, 0]]
+  let expectedSuggestion = Just $ RemoveCandidates { coords: [ Tuple 5 0
+                                                             , Tuple 5 1
+                                                             , Tuple 5 2
+                                                             , Tuple 5 3
+                                                             , Tuple 5 4
+                                                             , Tuple 5 5
+                                                             ]
+                                                   , color: Seven }
+  assertEqual { expected: expectedSuggestion, actual: findClaimingVerticies worksheet }
+
 testSolve :: Effect Unit
 testSolve = do
   testCrossHatchReturnsNothingWhenNoneAvailable
@@ -107,3 +149,5 @@ testSolve = do
   testCrossHatchReturnsSuggestionForRow
   testNakedSingle
   testHiddenSingle
+  testClaimingVerticiesInRow
+  testClaimingVerticiesInBlock
