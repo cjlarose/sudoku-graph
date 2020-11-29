@@ -15,7 +15,7 @@ import Node.ReadLine as ReadLine
 
 import Sudoku.VertexColor as Color
 import Sudoku.Worksheet as Worksheet
-import Sudoku.Worksheet (Worksheet(..), AnnotatedWorksheet(..), from2dArray, setVertexColor, setVertexColorWithAnnotations, showWorksheet, showAnnotatedWorksheet, addAnnotations)
+import Sudoku.Worksheet (Worksheet, AnnotatedWorksheet, from2dArray, setVertexColor, setVertexColorWithAnnotations, showWorksheet, showAnnotatedWorksheet, addAnnotations, stripAnnotations)
 import Sudoku.Solve (findCrossHatch, findNakedSingle, findHiddenSingle)
 import Sudoku.PartialColoring (Coord)
 import Sudoku.VertexColor (VertexColor)
@@ -37,7 +37,7 @@ findJust (Cons f fs) x = case f x of
 
 annotatedWorksheetStrategies :: List (AnnotatedWorksheet -> Maybe Suggestion)
 annotatedWorksheetStrategies = map toSuggestion <$> List.fromFoldable $
-  [ Tuple "Cross-Hatching" $ findCrossHatch <<< (\(AnnotatedWorksheet ws) -> Worksheet ws.coloring)
+  [ Tuple "Cross-Hatching" $ findCrossHatch <<< stripAnnotations
   , Tuple "Naked Single" findNakedSingle
   , Tuple "Hidden Single" findHiddenSingle
   ]

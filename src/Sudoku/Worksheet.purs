@@ -7,6 +7,7 @@ module Sudoku.Worksheet
   , showWorksheet
   , showAnnotatedWorksheet
   , addAnnotations
+  , stripAnnotations
   , complete
   , completeWithAnnotations
   ) where
@@ -48,6 +49,9 @@ showAnnotatedWorksheet (AnnotatedWorksheet worksheet) = coloringString <> "\n" <
 addAnnotations :: Worksheet -> AnnotatedWorksheet
 addAnnotations (Worksheet coloring) = AnnotatedWorksheet { coloring: coloring
                                                          , annotations: CA.fromPartialColoring $ coloring }
+
+stripAnnotations :: AnnotatedWorksheet -> Worksheet
+stripAnnotations (AnnotatedWorksheet { coloring: coloring }) = Worksheet coloring
 
 complete :: Worksheet -> Boolean
 complete (Worksheet coloring) = PC.complete coloring
