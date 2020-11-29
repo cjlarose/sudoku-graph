@@ -42,8 +42,8 @@ annotatedWorksheetStrategies = map toSuggestion <$> List.fromFoldable $
       action <- f x
       pure { strategyName: name, action: action })
 
-getSuggestion :: AnnotatedWorksheet -> Maybe Suggestion
-getSuggestion = findJust annotatedWorksheetStrategies
+getSuggestionForAnnotatedWorksheet :: AnnotatedWorksheet -> Maybe Suggestion
+getSuggestionForAnnotatedWorksheet = findJust annotatedWorksheetStrategies
 
 applySuggestion :: Suggestion -> AnnotatedWorksheet -> AnnotatedWorksheet
 applySuggestion { action: action } =
@@ -52,7 +52,7 @@ applySuggestion { action: action } =
 
 suggestAndPromptWithAnnotations :: ReadLine.Interface -> AnnotatedWorksheet -> Effect Unit
 suggestAndPromptWithAnnotations interface worksheet = do
-  let result = getSuggestion worksheet
+  let result = getSuggestionForAnnotatedWorksheet worksheet
   case result of
     Just suggestion -> do
       log <<< showSuggestion $ suggestion
