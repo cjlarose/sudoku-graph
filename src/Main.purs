@@ -15,7 +15,7 @@ import Node.ReadLine as ReadLine
 
 import Sudoku.Worksheet as Worksheet
 import Sudoku.Worksheet (Worksheet, AnnotatedWorksheet, from2dArray, setVertexColor, setVertexColorWithAnnotations, removeCandidatesFromCoords, showWorksheet, showAnnotatedWorksheet, addAnnotations, stripAnnotations)
-import Sudoku.Solve (findCrossHatch, findNakedSingle, findHiddenSingle, findClaimingVerticies)
+import Sudoku.Solve (findCrossHatch, findNakedSingle, findHiddenSingle, findNakedNTuple, findClaimingVerticies)
 import Sudoku.Suggestion (Suggestion, SuggestedAction(..), showSuggestion)
 
 printWorksheet :: Worksheet -> Effect Unit
@@ -46,6 +46,7 @@ annotatedWorksheetStrategies = List.fromFoldable $
   [ toSuggestion "Cross-Hatching" $ findCrossHatch <<< stripAnnotations
   , toSuggestion "Naked Single" findNakedSingle
   , toSuggestion "Hidden Single" findHiddenSingle
+  , toSuggestion "Naked n-Tuple" findNakedNTuple
   , toSuggestion "Claiming" findClaimingVerticies
   ]
   where
