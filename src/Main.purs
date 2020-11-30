@@ -9,13 +9,12 @@ import Data.Options ((:=))
 import Data.Maybe (Maybe(..))
 import Data.List (List(..))
 import Data.List as List
-import Data.Foldable (foldl)
 
 import Node.Process as Process
 import Node.ReadLine as ReadLine
 
 import Sudoku.Worksheet as Worksheet
-import Sudoku.Worksheet (Worksheet, AnnotatedWorksheet, from2dArray, setVertexColor, setVertexColorWithAnnotations, removeCandidateFromCoords, showWorksheet, showAnnotatedWorksheet, addAnnotations, stripAnnotations)
+import Sudoku.Worksheet (Worksheet, AnnotatedWorksheet, from2dArray, setVertexColor, setVertexColorWithAnnotations, removeCandidatesFromCoords, showWorksheet, showAnnotatedWorksheet, addAnnotations, stripAnnotations)
 import Sudoku.Solve (findCrossHatch, findNakedSingle, findHiddenSingle, findClaimingVerticies)
 import Sudoku.Suggestion (Suggestion, SuggestedAction(..), showSuggestion)
 
@@ -61,7 +60,7 @@ applySuggestionToAnnotatedWorksheet :: Suggestion -> AnnotatedWorksheet -> Annot
 applySuggestionToAnnotatedWorksheet { action: action } =
   case action of
     FillCell { coord: coord, color: color} -> setVertexColorWithAnnotations coord color
-    RemoveCandidates { coords: coords, colors: colors } -> (\ws -> foldl (\acc color -> removeCandidateFromCoords coords color acc) ws colors)
+    RemoveCandidates { coords: coords, colors: colors } -> removeCandidatesFromCoords coords colors
 
 suggestAndPromptWithAnnotations :: ReadLine.Interface -> AnnotatedWorksheet -> Effect Unit
 suggestAndPromptWithAnnotations interface worksheet = do

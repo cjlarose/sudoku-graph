@@ -4,7 +4,7 @@ module Sudoku.Worksheet
   , from2dArray
   , setVertexColor
   , setVertexColorWithAnnotations
-  , removeCandidateFromCoords
+  , removeCandidatesFromCoords
   , showWorksheet
   , showAnnotatedWorksheet
   , addAnnotations
@@ -14,6 +14,8 @@ module Sudoku.Worksheet
   ) where
 
 import Prelude
+
+import Data.Set as Set
 
 import Sudoku.VertexColor (VertexColor)
 import Sudoku.Grid (fromPartialColoring, showGrid)
@@ -36,12 +38,12 @@ setVertexColorWithAnnotations :: Coord -> VertexColor -> AnnotatedWorksheet -> A
 setVertexColorWithAnnotations coord color (AnnotatedWorksheet ws) = AnnotatedWorksheet { coloring: newColoring, annotations: newAnnotations }
   where
     newColoring = PC.setVertexColor coord color ws.coloring
-    newAnnotations = CA.removeAllCandidatesForCoord coord <<< CA.removeCandidateFromCoords (adjacentVertices coord) color $ ws.annotations
+    newAnnotations = CA.removeAllCandidatesForCoord coord <<< CA.removeCandidatesFromCoords (adjacentVertices coord) (Set.singleton color) $ ws.annotations
 
-removeCandidateFromCoords :: Array Coord -> VertexColor -> AnnotatedWorksheet -> AnnotatedWorksheet
-removeCandidateFromCoords coords color (AnnotatedWorksheet ws) = AnnotatedWorksheet $ ws { annotations = newAnnotations }
+removeCandidatesFromCoords :: Array Coord -> Set.Set VertexColor -> AnnotatedWorksheet -> AnnotatedWorksheet
+removeCandidatesFromCoords coords colors (AnnotatedWorksheet ws) = AnnotatedWorksheet $ ws { annotations = newAnnotations }
   where
-    newAnnotations = CA.removeCandidateFromCoords coords color ws.annotations
+    newAnnotations = CA.removeCandidatesFromCoords coords colors ws.annotations
 
 showWorksheet :: Worksheet -> String
 showWorksheet (Worksheet coloring) = showGrid <<< fromPartialColoring $ coloring

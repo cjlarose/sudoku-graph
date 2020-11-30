@@ -4,7 +4,7 @@ module Sudoku.CandidateAnnotations
   , candidatesForCoord
   , showCandidates
   , removeAllCandidatesForCoord
-  , removeCandidateFromCoords
+  , removeCandidatesFromCoords
   , find
   ) where
 
@@ -43,10 +43,10 @@ showCandidates (CandidateAnnotations annotations) = joinWith "\n" <<< map showAn
 removeAllCandidatesForCoord :: Coord -> CandidateAnnotations -> CandidateAnnotations
 removeAllCandidatesForCoord coord (CandidateAnnotations annotations) = CandidateAnnotations <<< Map.delete coord $ annotations
 
-removeCandidateFromCoords :: forall f. Foldable f => f Coord -> VertexColor -> CandidateAnnotations -> CandidateAnnotations
-removeCandidateFromCoords coords color (CandidateAnnotations annotations) = CandidateAnnotations $ foldl remove annotations coords
+removeCandidatesFromCoords :: forall f. Foldable f => f Coord -> Set.Set VertexColor -> CandidateAnnotations -> CandidateAnnotations
+removeCandidatesFromCoords coords colors (CandidateAnnotations annotations) = CandidateAnnotations $ foldl remove annotations coords
   where
-    remove acc coord = Map.update (\candidates -> Just <<< Set.difference candidates <<< Set.singleton $ color) coord acc
+    remove acc coord = Map.update (\candidates -> Just <<< Set.difference candidates $ colors) coord acc
 
 find :: (Set.Set VertexColor -> Boolean) -> CandidateAnnotations -> Maybe (Tuple Coord (Set.Set VertexColor))
 find f (CandidateAnnotations annotations) = do
