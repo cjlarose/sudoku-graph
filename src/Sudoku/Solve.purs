@@ -114,8 +114,7 @@ findNakedNTuple :: AnnotatedWorksheet -> Maybe SuggestedAction
 findNakedNTuple (AnnotatedWorksheet { coloring: coloring, annotations: annotations }) = LazyList.head do
   k <- LazyList.fromFoldable [2, 3, 4]
   clique <- LazyList.fromFoldable cliques
-  verticies <- LazyList.fromFoldable <<< kCombinations k $ clique
-  guard $ Set.subset verticies (uncoloredVerticies coloring)
+  verticies <- LazyList.fromFoldable <<< kCombinations k <<< Set.intersection clique <<< uncoloredVerticies $ coloring
   let candidates = Set.unions <<< catMaybes <<< Set.map (flip candidatesForCoord annotations) $ verticies
   guard $ Set.size candidates == k
   let remainingVertices = Set.difference clique verticies
