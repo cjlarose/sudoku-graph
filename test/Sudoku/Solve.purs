@@ -8,6 +8,7 @@ import Effect (Effect)
 import Test.Assert (assertEqual)
 import Data.Maybe (Maybe(..))
 import Data.Tuple (Tuple(..))
+import Data.Set as Set
 
 import Sudoku.Solve (findCrossHatch, findNakedSingle, findHiddenSingle, findClaimingVerticies)
 import Sudoku.VertexColor (VertexColor(..))
@@ -117,7 +118,7 @@ testClaimingVerticiesInRow = do
                                                              , Tuple 5 4
                                                              , Tuple 5 5
                                                              ]
-                                                   , color: Eight }
+                                                   , colors: Set.singleton Eight }
   assertEqual { expected: expectedSuggestion, actual: findClaimingVerticies worksheet }
 
 testClaimingVerticiesInBlock :: Effect Unit
@@ -138,7 +139,7 @@ testClaimingVerticiesInBlock = do
                                                              , Tuple 5 4
                                                              , Tuple 5 5
                                                              ]
-                                                   , color: Seven }
+                                                   , colors: Set.singleton Seven }
   assertEqual { expected: expectedSuggestion, actual: findClaimingVerticies worksheet }
 
 testSolve :: Effect Unit

@@ -9,6 +9,7 @@ import Data.Options ((:=))
 import Data.Maybe (Maybe(..))
 import Data.List (List(..))
 import Data.List as List
+import Data.Foldable (foldl)
 
 import Node.Process as Process
 import Node.ReadLine as ReadLine
@@ -60,7 +61,7 @@ applySuggestionToAnnotatedWorksheet :: Suggestion -> AnnotatedWorksheet -> Annot
 applySuggestionToAnnotatedWorksheet { action: action } =
   case action of
     FillCell { coord: coord, color: color} -> setVertexColorWithAnnotations coord color
-    RemoveCandidates { coords: coords, color: color } -> removeCandidateFromCoords coords color
+    RemoveCandidates { coords: coords, colors: colors } -> (\ws -> foldl (\acc color -> removeCandidateFromCoords coords color acc) ws colors)
 
 suggestAndPromptWithAnnotations :: ReadLine.Interface -> AnnotatedWorksheet -> Effect Unit
 suggestAndPromptWithAnnotations interface worksheet = do

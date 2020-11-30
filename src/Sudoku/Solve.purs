@@ -77,4 +77,4 @@ findClaimingVerticies (AnnotatedWorksheet ws) = LazyList.head do
   let cellsInRightHouse = vertexSubsetWithCandidate color ws.annotations rightHouse
   let cellsToRemoveCandidates = Set.difference cellsInRightHouse intersection
   guard <<< not <<< Set.isEmpty $ cellsToRemoveCandidates
-  pure $ RemoveCandidates { coords: Set.toUnfoldable cellsToRemoveCandidates, color: color }
+  pure $ RemoveCandidates { coords: Set.toUnfoldable cellsToRemoveCandidates, colors: Set.singleton color }
