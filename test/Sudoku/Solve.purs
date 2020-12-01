@@ -10,7 +10,7 @@ import Data.Maybe (Maybe(..))
 import Data.Tuple (Tuple(..))
 import Data.Set as Set
 
-import Sudoku.Solve (findCrossHatch, findNakedSingle, findHiddenSingle, findClaimingVerticies, kCombinations, findNakedNTuple)
+import Sudoku.Solve (findCrossHatch, findNakedSingle, findHiddenSingle, findClaimingVerticies, findNakedNTuple)
 import Sudoku.VertexColor (VertexColor(..))
 import Sudoku.Worksheet (addAnnotations)
 import Sudoku.Worksheet as WS
@@ -142,16 +142,6 @@ testClaimingVerticiesInBlock = do
                                                    , colors: Set.singleton Seven }
   assertEqual { expected: expectedSuggestion, actual: findClaimingVerticies worksheet }
 
-testKCominations :: Effect Unit
-testKCominations = do
-  let elements = Set.fromFoldable [2, 6, 9]
-  let expectedPairs = Set.fromFoldable [ Set.fromFoldable [2, 6]
-                                       , Set.fromFoldable [2, 9]
-                                       , Set.fromFoldable [6, 9]
-                                       ]
-  assertEqual { expected: expectedPairs, actual: kCombinations 2 elements }
-
-
 testNakedPair :: Effect Unit
 testNakedPair = do
   let worksheet = addAnnotations <<< WS.from2dArray $ [[0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -209,7 +199,6 @@ testSolve = do
   testHiddenSingle
   testClaimingVerticiesInRow
   testClaimingVerticiesInBlock
-  testKCominations
   testNakedPair
   testNakedTriplet
   testNakedQuad

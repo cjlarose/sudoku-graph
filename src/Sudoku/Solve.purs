@@ -4,7 +4,6 @@ module Sudoku.Solve
   , findHiddenSingle
   , findClaimingVerticies
   , findNakedNTuple
-  , kCombinations
   ) where
 
 import Prelude
@@ -13,7 +12,6 @@ import Data.Maybe (Maybe(..))
 import Data.Tuple (Tuple(..))
 import Data.Set as Set
 import Data.List.Lazy as LazyList
-import Data.Foldable (class Foldable, foldMap)
 import Control.MonadZero (guard)
 
 import Sudoku.VertexColor (VertexColor, allColors)
@@ -22,6 +20,7 @@ import Sudoku.CandidateAnnotations (CandidateAnnotations, candidatesForCoord)
 import Sudoku.CandidateAnnotations as CA
 import Sudoku.Worksheet (Worksheet, AnnotatedWorksheet(..), addAnnotations)
 import Sudoku.Suggestion (SuggestedAction(..))
+import Sudoku.SetUtils (kCombinations, catMaybes)
 
 -- Cross-Hatching is identifying any uncolored vertex within a 9-clique that
 -- can uniquely be assigned a particular color. It is equivalent to the "Hidden
@@ -81,22 +80,6 @@ findClaimingVerticies (AnnotatedWorksheet ws) = LazyList.head do
   let cellsToRemoveCandidates = Set.difference cellsInRightHouse intersection
   guard <<< not <<< Set.isEmpty $ cellsToRemoveCandidates
   pure $ RemoveCandidates { coords: Set.toUnfoldable cellsToRemoveCandidates, colors: Set.singleton color }
-
-kCombinations :: forall a. Ord a => Int -> Set.Set a -> Set.Set (Set.Set a)
-kCombinations 0 _ = Set.singleton Set.empty
-kCombinations k elements =
-  case Set.findMin elements of
-    Nothing -> Set.empty
-    Just minElement -> Set.union withMin withoutMin
-      where
-        withMin = Set.map (Set.insert minElement) <<< kCombinations (k - 1) <<< Set.delete minElement $ elements
-        withoutMin = kCombinations k <<< Set.delete minElement $ elements
-
-catMaybes :: forall a b. Foldable a => Ord b => a (Maybe b) -> Set.Set b
-catMaybes xs = foldMap f xs
-  where
-    f Nothing = Set.empty
-    f (Just x) = Set.singleton x
 
 -- If in any subset of the uncolored verticies in a 9-clique, the number of
 -- distinct candidates among them is equal to the cardinality of the subset k,
