@@ -46,10 +46,10 @@ annotatedWorksheetStrategies = List.fromFoldable $
   [ toSuggestion "Cross-Hatching" $ findCrossHatch <<< stripAnnotations
   , toSuggestion "Naked Single" findNakedSingle
   , toSuggestion "Hidden Single" findHiddenSingle
+  , toSuggestion "Claiming" findClaimingVerticies
   , toSuggestion "Naked Pair" $ findNakedNTuple 2
   , toSuggestion "Naked Triplet" $ findNakedNTuple 3
   , toSuggestion "Naked Quad" $ findNakedNTuple 4
-  , toSuggestion "Claiming" findClaimingVerticies
   ]
   where
     toSuggestion :: String -> (AnnotatedWorksheet -> Maybe SuggestedAction) -> AnnotatedWorksheet -> Maybe Suggestion
