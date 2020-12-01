@@ -155,7 +155,7 @@ testNakedPair = do
                                                       ,[0, 0, 0, 0, 0, 0, 0, 0, 0]]
   let expectedSuggestion = Just $ RemoveCandidates { coords: [ Tuple 6 7 ]
                                                    , colors: Set.fromFoldable [Eight, Nine] }
-  assertEqual { expected: expectedSuggestion, actual: findNakedNTuple worksheet }
+  assertEqual { expected: expectedSuggestion, actual: findNakedNTuple 2 worksheet }
 
 testNakedTriplet :: Effect Unit
 testNakedTriplet = do
@@ -170,7 +170,7 @@ testNakedTriplet = do
                                                       ,[0, 0, 0, 0, 0, 0, 0, 0, 0]]
   let expectedSuggestion = Just $ RemoveCandidates { coords: [ Tuple 8 1 ]
                                                    , colors: Set.fromFoldable [Seven, Eight, Nine] }
-  assertEqual { expected: expectedSuggestion, actual: findNakedNTuple worksheet }
+  assertEqual { expected: expectedSuggestion, actual: findNakedNTuple 3 worksheet }
 
 testNakedQuad :: Effect Unit
 testNakedQuad = do
@@ -187,7 +187,7 @@ testNakedQuad = do
                                                              , Tuple 3 4
                                                              , Tuple 3 5 ]
                                                    , colors: Set.fromFoldable [Two, Three, Four, Five] }
-  assertEqual { expected: expectedSuggestion, actual: findNakedNTuple worksheet }
+  assertEqual { expected: expectedSuggestion, actual: findNakedNTuple 4 worksheet }
 
 testSolve :: Effect Unit
 testSolve = do

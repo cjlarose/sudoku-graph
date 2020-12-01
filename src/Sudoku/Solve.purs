@@ -93,9 +93,8 @@ findClaimingVerticies (AnnotatedWorksheet ws) = LazyList.head do
 -- "Naked Triplets", and "Naked Quads". Extending past k = 4 doesn't make
 -- sense since if there exists a "Naked Quintuple", in the worst case the
 -- remaning four cells in the clique form a Naked Quad
-findNakedNTuple :: AnnotatedWorksheet -> Maybe SuggestedAction
-findNakedNTuple (AnnotatedWorksheet { coloring: coloring, annotations: annotations }) = LazyList.head do
-  k <- LazyList.fromFoldable [2, 3, 4]
+findNakedNTuple :: Int -> AnnotatedWorksheet -> Maybe SuggestedAction
+findNakedNTuple k (AnnotatedWorksheet { coloring: coloring, annotations: annotations }) = LazyList.head do
   clique <- LazyList.fromFoldable cliques
   verticies <- LazyList.fromFoldable <<< kCombinations k <<< Set.intersection clique <<< uncoloredVerticies $ coloring
   let candidates = Set.unions <<< catMaybes <<< Set.map (flip candidatesForCoord annotations) $ verticies
