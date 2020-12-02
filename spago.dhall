@@ -10,9 +10,11 @@ You can edit this file as you like.
   , "exceptions"
   , "foldable-traversable"
   , "maybe"
+  , "node-fs"
   , "node-process"
   , "node-readline"
   , "ordered-collections"
+  , "parsing"
   , "psci-support"
   , "tuples"
   ]

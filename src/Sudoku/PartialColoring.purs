@@ -11,6 +11,7 @@ module Sudoku.PartialColoring
   , getVertexColor
   , setVertexColor
   , complete
+  , allCoords
   ) where
 
 import Prelude
