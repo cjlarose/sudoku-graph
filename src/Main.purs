@@ -15,7 +15,7 @@ import Node.ReadLine as ReadLine
 
 import Sudoku.Worksheet as Worksheet
 import Sudoku.Worksheet (Worksheet, AnnotatedWorksheet, from2dArray, setVertexColor, setVertexColorWithAnnotations, removeCandidatesFromCoords, showWorksheet, showAnnotatedWorksheet, addAnnotations, stripAnnotations)
-import Sudoku.Solve (findCrossHatch, findNakedSingle, findHiddenSingle, findNakedNTuple, findClaimingVerticies)
+import Sudoku.Techniques (findCrossHatch, findNakedSingle, findHiddenSingle, findNakedNTuple, findClaimingVerticies)
 import Sudoku.Suggestion (Suggestion, SuggestedAction(..), showSuggestion)
 
 printWorksheet :: Worksheet -> Effect Unit

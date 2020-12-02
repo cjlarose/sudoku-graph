@@ -1,5 +1,5 @@
-module Test.Sudoku.Solve
-  ( testSolve
+module Test.Sudoku.Techniques
+  ( testTechniques
   ) where
 
 import Prelude
@@ -10,7 +10,7 @@ import Data.Maybe (Maybe(..))
 import Data.Tuple (Tuple(..))
 import Data.Set as Set
 
-import Sudoku.Solve (findCrossHatch, findNakedSingle, findHiddenSingle, findClaimingVerticies, findNakedNTuple)
+import Sudoku.Techniques (findCrossHatch, findNakedSingle, findHiddenSingle, findClaimingVerticies, findNakedNTuple)
 import Sudoku.VertexColor (VertexColor(..))
 import Sudoku.Worksheet (addAnnotations)
 import Sudoku.Worksheet as WS
@@ -189,8 +189,8 @@ testNakedQuad = do
                                                    , colors: Set.fromFoldable [Two, Three, Four, Five] }
   assertEqual { expected: expectedSuggestion, actual: findNakedNTuple 4 worksheet }
 
-testSolve :: Effect Unit
-testSolve = do
+testTechniques :: Effect Unit
+testTechniques = do
   testCrossHatchReturnsNothingWhenNoneAvailable
   testCrossHatchReturnsSuggestionForBlock
   testCrossHatchReturnsSuggestionForColumn

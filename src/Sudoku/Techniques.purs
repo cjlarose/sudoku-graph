@@ -1,4 +1,4 @@
-module Sudoku.Solve
+module Sudoku.Techniques
   ( findCrossHatch
   , findNakedSingle
   , findHiddenSingle
