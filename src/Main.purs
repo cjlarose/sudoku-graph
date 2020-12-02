@@ -4,66 +4,22 @@ import Prelude
 
 import Effect (Effect)
 import Effect.Console (log)
-import Effect.Exception.Unsafe (unsafeThrow)
 import Data.Options ((:=))
 import Data.Maybe (Maybe(..))
-import Data.List (List(..))
-import Data.List as List
 
 import Node.Process as Process
 import Node.ReadLine as ReadLine
 
 import Sudoku.Worksheet as Worksheet
-import Sudoku.Worksheet (Worksheet, AnnotatedWorksheet, from2dArray, setVertexColor, setVertexColorWithAnnotations, removeCandidatesFromCoords, showWorksheet, showAnnotatedWorksheet, addAnnotations, stripAnnotations)
-import Sudoku.Techniques (findCrossHatch, findNakedSingle, findHiddenSingle, findNakedNTuple, findClaimingVerticies)
-import Sudoku.Suggestion (Suggestion, SuggestedAction(..), showSuggestion)
+import Sudoku.Worksheet (Worksheet, AnnotatedWorksheet, from2dArray, showWorksheet, showAnnotatedWorksheet, addAnnotations)
+import Sudoku.Suggestion (showSuggestion)
+import Sudoku.Solve (getSuggestion, getSuggestionForAnnotatedWorksheet, applySuggestion, applySuggestionToAnnotatedWorksheet)
 
 printWorksheet :: Worksheet -> Effect Unit
 printWorksheet = log <<< showWorksheet
 
 printAnnotatedWorksheet :: AnnotatedWorksheet -> Effect Unit
 printAnnotatedWorksheet = log <<< showAnnotatedWorksheet
-
-getSuggestion :: Worksheet -> Maybe Suggestion
-getSuggestion worksheet = do
-  action <- findCrossHatch worksheet
-  pure $ { strategyName: "Cross-Hatching", action: action }
-
-applySuggestion :: Suggestion -> Worksheet -> Worksheet
-applySuggestion { action: action } =
-  case action of
-    FillCell { coord: coord, color: color } -> setVertexColor coord color
-    _ -> unsafeThrow "Impossible"
-
-findJust :: forall a b. List (a -> Maybe b) -> a -> Maybe b
-findJust Nil _ = Nothing
-findJust (Cons f fs) x = case f x of
-                           Just y -> Just y
-                           Nothing -> findJust fs x
-
-annotatedWorksheetStrategies :: List (AnnotatedWorksheet -> Maybe Suggestion)
-annotatedWorksheetStrategies = List.fromFoldable $
-  [ toSuggestion "Cross-Hatching" $ findCrossHatch <<< stripAnnotations
-  , toSuggestion "Naked Single" findNakedSingle
-  , toSuggestion "Hidden Single" findHiddenSingle
-  , toSuggestion "Claiming" findClaimingVerticies
-  , toSuggestion "Naked Pair" $ findNakedNTuple 2
-  , toSuggestion "Naked Triplet" $ findNakedNTuple 3
-  , toSuggestion "Naked Quad" $ findNakedNTuple 4
-  ]
-  where
-    toSuggestion :: String -> (AnnotatedWorksheet -> Maybe SuggestedAction) -> AnnotatedWorksheet -> Maybe Suggestion
-    toSuggestion name f x =
-      (\action -> { strategyName: name, action: action }) <$> f x
-
-getSuggestionForAnnotatedWorksheet :: AnnotatedWorksheet -> Maybe Suggestion
-getSuggestionForAnnotatedWorksheet = findJust annotatedWorksheetStrategies
-
-applySuggestionToAnnotatedWorksheet :: Suggestion -> AnnotatedWorksheet -> AnnotatedWorksheet
-applySuggestionToAnnotatedWorksheet { action: action } =
-  case action of
-    FillCell { coord: coord, color: color} -> setVertexColorWithAnnotations coord color
-    RemoveCandidates { coords: coords, colors: colors } -> removeCandidatesFromCoords coords colors
 
 suggestAndPromptWithAnnotations :: ReadLine.Interface -> AnnotatedWorksheet -> Effect Unit
 suggestAndPromptWithAnnotations interface worksheet = do
