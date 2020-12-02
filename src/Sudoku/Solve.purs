@@ -3,6 +3,7 @@ module Sudoku.Solve
   , getSuggestionForAnnotatedWorksheet
   , applySuggestion
   , applySuggestionToAnnotatedWorksheet
+  , solveWorksheet
   ) where
 
 import Prelude
@@ -12,7 +13,7 @@ import Data.Maybe (Maybe(..))
 import Data.List (List(..))
 import Data.List as List
 
-import Sudoku.Worksheet (Worksheet, AnnotatedWorksheet, setVertexColor, setVertexColorWithAnnotations, removeCandidatesFromCoords, stripAnnotations)
+import Sudoku.Worksheet (Worksheet, AnnotatedWorksheet, setVertexColor, setVertexColorWithAnnotations, removeCandidatesFromCoords, addAnnotations, stripAnnotations, completeWithAnnotations)
 import Sudoku.Techniques (findCrossHatch, findNakedSingle, findHiddenSingle, findNakedNTuple, findClaimingVerticies)
 import Sudoku.Suggestion (Suggestion, SuggestedAction(..))
 
@@ -57,3 +58,12 @@ applySuggestionToAnnotatedWorksheet { action: action } =
     FillCell { coord: coord, color: color} -> setVertexColorWithAnnotations coord color
     RemoveCandidates { coords: coords, colors: colors } -> removeCandidatesFromCoords coords colors
 
+solveAnnotatedWorksheet :: AnnotatedWorksheet -> AnnotatedWorksheet
+solveAnnotatedWorksheet ws | completeWithAnnotations ws = ws
+solveAnnotatedWorksheet ws =
+  case getSuggestionForAnnotatedWorksheet ws of
+    Nothing -> ws
+    Just suggestion -> solveAnnotatedWorksheet <<< applySuggestionToAnnotatedWorksheet suggestion $ ws
+
+solveWorksheet :: Worksheet -> AnnotatedWorksheet
+solveWorksheet = solveAnnotatedWorksheet <<< addAnnotations
