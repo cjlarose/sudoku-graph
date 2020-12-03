@@ -59,11 +59,11 @@ testMagicTour1465 = do
     Right xs -> do
       for_ xs \coloring -> do
         let worksheet = Worksheet coloring
-        log "Problem input:"
-        log <<< showWorksheet $ worksheet
+        -- log "Problem input:"
+        -- log <<< showWorksheet $ worksheet
         let maybeSolved = solveWorksheet worksheet
-        log "Final state:" 
-        log <<< showAnnotatedWorksheet $ maybeSolved
+        -- log "Final state:"
+        -- log <<< showAnnotatedWorksheet $ maybeSolved
         assert' "Not complete" <<< completeWithAnnotations $ maybeSolved
 
 main :: Effect Unit
