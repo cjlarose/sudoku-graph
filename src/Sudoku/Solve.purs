@@ -28,12 +28,6 @@ applySuggestion { action: action } =
     FillCell { coord: coord, color: color } -> setVertexColor coord color
     _ -> unsafeThrow "Impossible"
 
-findJust :: forall a b. List (a -> Maybe b) -> a -> Maybe b
-findJust Nil _ = Nothing
-findJust (Cons f fs) x = case f x of
-                           Just y -> Just y
-                           Nothing -> findJust fs x
-
 annotatedWorksheetStrategies :: List (AnnotatedWorksheet -> Maybe Suggestion)
 annotatedWorksheetStrategies = List.fromFoldable $
   [ toSuggestion "Naked Single" findNakedSingle
@@ -49,7 +43,13 @@ annotatedWorksheetStrategies = List.fromFoldable $
       (\action -> { strategyName: name, action: action }) <$> f x
 
 getSuggestionForAnnotatedWorksheet :: AnnotatedWorksheet -> Maybe Suggestion
-getSuggestionForAnnotatedWorksheet = findJust annotatedWorksheetStrategies
+getSuggestionForAnnotatedWorksheet ws = go annotatedWorksheetStrategies
+  where
+    go (Cons f fs) = case f ws of
+                       Just suggestion -> Just suggestion
+                       Nothing -> go fs
+    go Nil = Nothing
+
 
 applySuggestionToAnnotatedWorksheet :: Suggestion -> AnnotatedWorksheet -> AnnotatedWorksheet
 applySuggestionToAnnotatedWorksheet { action: action } =
