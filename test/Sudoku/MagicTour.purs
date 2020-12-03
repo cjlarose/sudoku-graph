@@ -6,9 +6,8 @@ module Test.Sudoku.MagicTour
 import Prelude
 
 import Effect (Effect)
-import Effect.Console (log)
-import Test.Assert (assert')
-import Node.FS.Sync as FSSync
+import Effect.Aff (launchAff_)
+import Node.FS.Aff as FS
 import Node.Encoding (Encoding(..))
 import Data.Maybe (Maybe(..))
 import Data.Char (toCharCode)
@@ -18,14 +17,19 @@ import Text.Parsing.Parser (ParserT, runParser)
 import Text.Parsing.Parser.Combinators (sepEndBy1)
 import Text.Parsing.Parser.String (char, oneOf, eof)
 import Data.Array (some, zipWith)
-import Data.List (List)
+import Data.List (List, mapWithIndex)
 import Data.Map as Map
 import Data.Set as Set
+import Data.Tuple (Tuple(..))
 import Data.Foldable (fold, for_)
+import Test.Unit (TestSuite, suite, test)
+import Test.Unit.Main (runTest)
+import Test.Unit.Assert as Assert
+import Effect.Class (liftEffect)
 
 import Sudoku.PartialColoring (PartialColoring(..), Coord, allCoords)
 import Sudoku.VertexColor (VertexColor, fromInt)
-import Sudoku.Worksheet (Worksheet(..), completeWithAnnotations, showWorksheet, showAnnotatedWorksheet)
+import Sudoku.Worksheet (Worksheet(..), completeWithAnnotations)
 import Sudoku.Solve (solveWorksheet)
 
 emptyCell :: forall m. Monad m => ParserT String m (Maybe VertexColor)
@@ -50,21 +54,18 @@ problem = toPartialColoring <$> some cellContent
 problems :: forall m. Monad m => ParserT String m (List PartialColoring)
 problems = sepEndBy1 problem (char '\n') <* eof
 
-testMagicTour1465 :: Effect Unit
-testMagicTour1465 = do
-  let path = "./test/magic-tour-top-1465.txt"
-  contents <- FSSync.readTextFile UTF8 path
-  case runParser contents problems of
-    Left err -> assert' ("error: " <> show err) false
-    Right xs -> do
-      for_ xs \coloring -> do
-        let worksheet = Worksheet coloring
-        log "Problem input:"
-        log <<< showWorksheet $ worksheet
-        let maybeSolved = solveWorksheet worksheet
-        log "Final state:" 
-        log <<< showAnnotatedWorksheet $ maybeSolved
-        assert' "Not complete" <<< completeWithAnnotations $ maybeSolved
+testMagicTour1465 :: List PartialColoring -> TestSuite
+testMagicTour1465 colorings = suite "magic tour" do
+  for_ (mapWithIndex Tuple colorings) \(Tuple i coloring) -> do
+    test ("problem " <> show i) do
+      let worksheet = Worksheet coloring
+      let maybeSolved = solveWorksheet worksheet
+      Assert.assert "Not complete" <<< completeWithAnnotations $ maybeSolved
 
 main :: Effect Unit
-main = testMagicTour1465
+main = launchAff_ do
+  let path = "./test/magic-tour-top-1465.txt"
+  contents <- FS.readTextFile UTF8 path
+  case runParser contents problems of
+    Left err -> Assert.assert ("error: " <> show err) false
+    Right colorings -> liftEffect <<< runTest <<< testMagicTour1465 $ colorings
