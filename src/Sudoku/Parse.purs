@@ -1,5 +1,5 @@
 module Sudoku.Parse
-  ( problem
+  ( singleProblem
   , problems
   ) where
 
@@ -38,6 +38,9 @@ problem = toPartialColoring <$> some cellContent
 
     toPartialColoring :: Array (Maybe VertexColor) -> PartialColoring
     toPartialColoring xs = PartialColoring <<< fold $ zipWith (\coord content -> toColoring coord content) (Set.toUnfoldable allCoords) xs
+
+singleProblem :: forall m. Monad m => ParserT String m PartialColoring
+singleProblem = problem <* eof
 
 problems :: forall m. Monad m => ParserT String m (List PartialColoring)
 problems = sepEndBy1 problem (char '\n') <* eof

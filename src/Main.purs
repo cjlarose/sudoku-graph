@@ -3,17 +3,20 @@ module Main where
 import Prelude
 
 import Effect (Effect)
-import Effect.Console (log)
+import Effect.Console (log, errorShow)
 import Data.Options ((:=))
 import Data.Maybe (Maybe(..))
+import Data.Either (Either(..))
 
 import Node.Process as Process
 import Node.ReadLine as ReadLine
+import Text.Parsing.Parser (runParser)
 
 import Sudoku.Worksheet as Worksheet
-import Sudoku.Worksheet (Worksheet, AnnotatedWorksheet, from2dArray, showWorksheet, showAnnotatedWorksheet, addAnnotations)
+import Sudoku.Worksheet (Worksheet, AnnotatedWorksheet, showWorksheet, showAnnotatedWorksheet, addAnnotations, fromColoring)
 import Sudoku.Suggestion (showSuggestion)
 import Sudoku.Solve (getSuggestion, getSuggestionForAnnotatedWorksheet, applySuggestion, applySuggestionToAnnotatedWorksheet)
+import Sudoku.Parse (singleProblem)
 
 printWorksheet :: Worksheet -> Effect Unit
 printWorksheet = log <<< showWorksheet
@@ -71,24 +74,17 @@ suggestAndPrompt interface worksheet = do
                             else Process.exit 0
       ReadLine.question "Continue [yN]? " handleLine interface
 
+handlePuzzleInput :: ReadLine.Interface -> String -> Effect Unit
+handlePuzzleInput interface input = do
+  case runParser input singleProblem of
+    Left err -> do
+      errorShow err
+      Process.exit 1
+    Right coloring -> do
+      let worksheet = fromColoring coloring
+      suggestAndPrompt interface worksheet
+
 main :: Effect Unit
 main = do
-  let worksheet = from2dArray [[9, 0, 0, 7, 5, 0, 0, 6, 8]
-                              ,[0, 2, 0, 0, 0, 9, 5, 0, 1]
-                              ,[6, 0, 7, 0, 3, 0, 2, 4, 0]
-                              ,[0, 0, 0, 0, 6, 0, 4, 5, 0]
-                              ,[0, 0, 5, 0, 2, 0, 0, 0, 3]
-                              ,[0, 0, 0, 0, 0, 5, 6, 0, 0]
-                              ,[0, 0, 0, 0, 0, 3, 1, 2, 0]
-                              ,[0, 1, 4, 2, 8, 0, 0, 9, 0]
-                              ,[0, 0, 0, 0, 7, 0, 0, 3, 0]]
-  log "Input:"
-  printWorksheet worksheet
-  if Worksheet.complete worksheet
-  then do
-    log "Puzzle complete!"
-    Process.exit 0
-  else do
-    log ""
-    interface <- ReadLine.createInterface Process.stdin $ ReadLine.output := Process.stdout
-    suggestAndPrompt interface worksheet
+  interface <- ReadLine.createInterface Process.stdin $ ReadLine.output := Process.stdout
+  ReadLine.question "Enter puzzle\n" (handlePuzzleInput interface) interface

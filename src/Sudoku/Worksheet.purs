@@ -2,6 +2,7 @@ module Sudoku.Worksheet
   ( Worksheet(..)
   , AnnotatedWorksheet(..)
   , from2dArray
+  , fromColoring
   , setVertexColor
   , setVertexColorWithAnnotations
   , removeCandidatesFromCoords
@@ -30,6 +31,9 @@ newtype AnnotatedWorksheet = AnnotatedWorksheet { coloring :: PartialColoring
 
 from2dArray :: Array (Array Int) -> Worksheet
 from2dArray = Worksheet <<< PC.from2dArray
+
+fromColoring :: PartialColoring -> Worksheet
+fromColoring = Worksheet
 
 setVertexColor :: Coord -> VertexColor -> Worksheet -> Worksheet
 setVertexColor coord color (Worksheet coloring) = Worksheet <<< PC.setVertexColor coord color $ coloring
