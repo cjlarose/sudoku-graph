@@ -23,9 +23,9 @@ import Data.Set as Set
 import Data.Tuple (Tuple(..))
 import Data.Foldable (fold, for_)
 import Test.Unit (TestSuite, suite, test)
-import Test.Unit.Main (runTest)
+import Test.Unit.Main (runTestWith)
+import Test.Unit.Output.Simple as SimpleOutput
 import Test.Unit.Assert as Assert
-import Effect.Class (liftEffect)
 
 import Sudoku.PartialColoring (PartialColoring(..), Coord, allCoords)
 import Sudoku.VertexColor (VertexColor, fromInt)
@@ -68,4 +68,4 @@ main = launchAff_ do
   contents <- FS.readTextFile UTF8 path
   case runParser contents problems of
     Left err -> Assert.assert ("error: " <> show err) false
-    Right colorings -> liftEffect <<< runTest <<< testMagicTour1465 $ colorings
+    Right colorings -> runTestWith SimpleOutput.runTest <<< testMagicTour1465 $ colorings
