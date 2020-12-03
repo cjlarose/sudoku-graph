@@ -13,7 +13,7 @@ import Data.Maybe (Maybe(..))
 import Data.List (List(..))
 import Data.List as List
 
-import Sudoku.Worksheet (Worksheet, AnnotatedWorksheet, setVertexColor, setVertexColorWithAnnotations, removeCandidatesFromCoords, addAnnotations, stripAnnotations, completeWithAnnotations)
+import Sudoku.Worksheet (Worksheet, AnnotatedWorksheet, setVertexColor, setVertexColorWithAnnotations, removeCandidatesFromCoords, addAnnotations, completeWithAnnotations)
 import Sudoku.Techniques (findCrossHatch, findNakedSingle, findHiddenSingle, findNakedNTuple, findClaimingVerticies)
 import Sudoku.Suggestion (Suggestion, SuggestedAction(..))
 
@@ -36,8 +36,7 @@ findJust (Cons f fs) x = case f x of
 
 annotatedWorksheetStrategies :: List (AnnotatedWorksheet -> Maybe Suggestion)
 annotatedWorksheetStrategies = List.fromFoldable $
-  [ toSuggestion "Cross-Hatching" $ findCrossHatch <<< stripAnnotations
-  , toSuggestion "Naked Single" findNakedSingle
+  [ toSuggestion "Naked Single" findNakedSingle
   , toSuggestion "Hidden Single" findHiddenSingle
   , toSuggestion "Claiming" findClaimingVerticies
   , toSuggestion "Naked Pair" $ findNakedNTuple 2
