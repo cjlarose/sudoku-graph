@@ -10,7 +10,7 @@ import Data.Maybe (Maybe(..))
 import Data.Tuple (Tuple(..))
 import Data.Set as Set
 
-import Sudoku.Techniques (findCrossHatch, findNakedSingle, findHiddenSingle, findClaimingVerticies, findNakedNTuple)
+import Sudoku.Techniques (findCrossHatch, findNakedSingle, findHiddenSingle, findHiddenNTuple, findClaimingVerticies, findNakedNTuple)
 import Sudoku.VertexColor (VertexColor(..))
 import Sudoku.Worksheet (addAnnotations)
 import Sudoku.Worksheet as WS
@@ -189,6 +189,39 @@ testNakedQuad = do
                                                    , colors: Set.fromFoldable [Two, Three, Four, Five] }
   assertEqual { expected: expectedSuggestion, actual: findNakedNTuple 4 worksheet }
 
+testHiddenPair :: Effect Unit
+testHiddenPair = do
+  let worksheet = addAnnotations <<< WS.from2dArray $ [[6, 7, 0, 3, 0, 0, 1, 4, 8]
+                                                      ,[0, 0, 0, 0, 0, 0, 0, 0, 0]
+                                                      ,[0, 0, 0, 0, 0, 0, 0, 0, 0]
+                                                      ,[0, 0, 0, 0, 0, 0, 0, 0, 0]
+                                                      ,[0, 0, 0, 0, 0, 0, 0, 0, 0]
+                                                      ,[0, 0, 9, 0, 0, 0, 0, 0, 0]
+                                                      ,[0, 0, 5, 0, 0, 0, 0, 0, 0]
+                                                      ,[0, 0, 0, 0, 0, 0, 0, 0, 0]
+                                                      ,[0, 0, 0, 0, 0, 0, 0, 0, 0]]
+  let expectedSuggestion = Just $ RemoveCandidates { coords: [ Tuple 0 4
+                                                             , Tuple 0 5 ]
+                                                   , colors: Set.fromFoldable [Two] }
+  assertEqual { expected: expectedSuggestion, actual: findHiddenNTuple 2 worksheet }
+
+testHiddenTriplet :: Effect Unit
+testHiddenTriplet = do
+  let worksheet = addAnnotations <<< WS.from2dArray $ [[6, 7, 0, 3, 0, 0, 0, 4, 8]
+                                                      ,[0, 0, 0, 0, 0, 0, 0, 0, 0]
+                                                      ,[0, 0, 0, 0, 0, 0, 0, 0, 0]
+                                                      ,[0, 0, 2, 0, 0, 0, 0, 0, 0]
+                                                      ,[0, 0, 0, 0, 0, 0, 1, 0, 0]
+                                                      ,[0, 0, 0, 0, 0, 0, 2, 0, 0]
+                                                      ,[0, 0, 0, 0, 0, 0, 5, 0, 0]
+                                                      ,[0, 0, 0, 0, 0, 0, 0, 0, 0]
+                                                      ,[0, 0, 0, 0, 0, 0, 0, 0, 0]]
+  let expectedSuggestion = Just $ RemoveCandidates { coords: [ Tuple 0 2
+                                                             , Tuple 0 4
+                                                             , Tuple 0 5 ]
+                                                   , colors: Set.fromFoldable [Nine] }
+  assertEqual { expected: expectedSuggestion, actual: findHiddenNTuple 3 worksheet }
+
 testTechniques :: Effect Unit
 testTechniques = do
   testCrossHatchReturnsNothingWhenNoneAvailable
@@ -202,3 +235,5 @@ testTechniques = do
   testNakedPair
   testNakedTriplet
   testNakedQuad
+  testHiddenPair
+  testHiddenTriplet

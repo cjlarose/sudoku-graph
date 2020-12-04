@@ -2,6 +2,7 @@ module Sudoku.Techniques
   ( findCrossHatch
   , findNakedSingle
   , findHiddenSingle
+  , findHiddenNTuple
   , findClaimingVerticies
   , findNakedNTuple
   ) where
@@ -11,8 +12,10 @@ import Prelude
 import Data.Maybe (Maybe(..))
 import Data.Tuple (Tuple(..))
 import Data.Set as Set
+import Data.Array as Array
 import Data.List.Lazy as LazyList
 import Control.MonadZero (guard)
+import Data.Foldable (and)
 
 import Sudoku.VertexColor (VertexColor, allColors)
 import Sudoku.PartialColoring (Coord, cliques, uncoloredVerticies)
@@ -48,6 +51,23 @@ findHiddenSingle (AnnotatedWorksheet ws) = LazyList.head do
   guard $ Set.size verticies == 1
   coord <- LazyList.fromFoldable <<< Set.findMin $ verticies
   pure $ FillCell { coord: coord, color: color }
+
+ -- If in a house (9-clique), there exists a set of k verticies that contain as
+ -- a subset each of the vertex candidate sets for k colors, then those
+ -- verticies cannot be any other color.
+findHiddenNTuple :: Int -> AnnotatedWorksheet -> Maybe SuggestedAction
+findHiddenNTuple k (AnnotatedWorksheet { annotations: annotations, coloring: coloring }) = LazyList.head do
+  clique <- LazyList.fromFoldable cliques
+  let uncoloredInClique = Set.intersection clique <<< uncoloredVerticies $ coloring
+  verticies <- LazyList.fromFoldable <<< kCombinations k $ uncoloredInClique
+  colors <- LazyList.fromFoldable <<< kCombinations k <<< candidatesInVertexSet annotations $ uncoloredInClique
+  guard <<< and <<< Set.map (\color -> Set.subset (vertexSubsetWithCandidate color annotations clique) verticies) $ colors
+  let unionOfCandidates = candidatesInVertexSet annotations verticies
+  let otherColors = Set.difference unionOfCandidates colors
+  pure $ RemoveCandidates { coords: Array.fromFoldable verticies, colors: otherColors }
+
+candidatesInVertexSet :: CandidateAnnotations -> Set.Set Coord -> Set.Set VertexColor
+candidatesInVertexSet annotations = Set.unions <<< catMaybes <<< Set.map (flip candidatesForCoord annotations)
 
 vertexSubsetWithCandidate :: VertexColor -> CandidateAnnotations -> Set.Set Coord -> Set.Set Coord
 vertexSubsetWithCandidate color annotations xs = Set.filter hasColorAsCandidate xs

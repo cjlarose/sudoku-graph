@@ -14,7 +14,7 @@ import Data.List (List(..))
 import Data.List as List
 
 import Sudoku.Worksheet (Worksheet, AnnotatedWorksheet, setVertexColor, setVertexColorWithAnnotations, removeCandidatesFromCoords, addAnnotations, completeWithAnnotations)
-import Sudoku.Techniques (findCrossHatch, findNakedSingle, findHiddenSingle, findNakedNTuple, findClaimingVerticies)
+import Sudoku.Techniques (findCrossHatch, findNakedSingle, findHiddenSingle, findHiddenNTuple, findNakedNTuple, findClaimingVerticies)
 import Sudoku.Suggestion (Suggestion, SuggestedAction(..))
 
 getSuggestion :: Worksheet -> Maybe Suggestion
@@ -36,6 +36,9 @@ annotatedWorksheetStrategies = List.fromFoldable $
   , toSuggestion "Naked Pair" $ findNakedNTuple 2
   , toSuggestion "Naked Triplet" $ findNakedNTuple 3
   , toSuggestion "Naked Quad" $ findNakedNTuple 4
+  , toSuggestion "Hidden Pair" $ findHiddenNTuple 2
+  , toSuggestion "Hidden Triplet" $ findHiddenNTuple 3
+  , toSuggestion "Hidden Quad" $ findHiddenNTuple 4
   ]
   where
     toSuggestion :: String -> (AnnotatedWorksheet -> Maybe SuggestedAction) -> AnnotatedWorksheet -> Maybe Suggestion
