@@ -64,6 +64,7 @@ findHiddenNTuple k (AnnotatedWorksheet { annotations: annotations, coloring: col
   guard <<< and <<< Set.map (\color -> Set.subset (vertexSubsetWithCandidate color annotations clique) verticies) $ colors
   let unionOfCandidates = candidatesInVertexSet annotations verticies
   let otherColors = Set.difference unionOfCandidates colors
+  guard <<< not <<< Set.isEmpty $ otherColors
   pure $ RemoveCandidates { coords: Array.fromFoldable verticies, colors: otherColors }
 
 candidatesInVertexSet :: CandidateAnnotations -> Set.Set Coord -> Set.Set VertexColor
